@@ -24,6 +24,12 @@ export class SevOneManager {
     return result;
   }
 
+  async getDevice(token: any, deviceId: string) {
+    let url = this.apiPath + `/api/v2/devices/${deviceId}`;
+    let data = await this.request(url,token);
+    return this.mapDeviceDataToFrame(data);
+  }
+
   async getDevices(token: any, queryType: number, size: number, page: number) {
     let url = this.apiPath + `/api/v2/devices?includeCount=false&page=${page}&size=${size}`;
     let data = await this.request(url,token);
@@ -113,6 +119,32 @@ export class SevOneManager {
         }
       }
       
+      frame.addField({
+        name: filedNames[i],
+        type: fieldType,
+        values: values,
+      });
+    }
+
+    return frame;
+  }
+
+  async mapDeviceDataToFrame(result: any) {
+    const frame = new MutableDataFrame({
+      fields: [],
+    });
+    let filedNames = Object.keys(result.data);
+    for (let i = 0; i < filedNames.length; i++) {
+      let values = [result.data[filedNames[i]]];
+      let fieldType = FieldType.string;
+      if(typeof values === "number"){
+        if(TIME_FILED_NAMES.includes(filedNames[i])){
+          fieldType = FieldType.time;
+        }else{
+          fieldType = FieldType.number;
+        }
+      }
+
       frame.addField({
         name: filedNames[i],
         type: fieldType,

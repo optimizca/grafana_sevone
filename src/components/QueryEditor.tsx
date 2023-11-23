@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { InlineField, Select, HorizontalGroup, InlineFieldRow, Input } from '@grafana/ui';
+import { InlineField, Select, InlineFieldRow, Input, VerticalGroup } from '@grafana/ui';
 import { QueryEditorProps } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { MyDataSourceOptions, MyQuery } from '../types';
@@ -63,26 +63,48 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
       description: 'Grab All Devices Data from SevOne',
       content: (
         <>
-          <InlineFieldRow>
-            <InlineField label="Size">
-              <Input
-                width={20}
-                name="Size"
-                defaultValue={query.size}
-                onBlur={(e) => updateQuery('size', e.target.value)}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Page">
-              <Input
-                width={20}
-                name="Page"
-                defaultValue={query.page}
-                onBlur={(e) => updateQuery('page', e.target.value)}
-              />
-            </InlineField>
-          </InlineFieldRow>
+          <VerticalGroup justify="space-between">
+            <InlineFieldRow>
+              <InlineField label="Devices">
+                <Select
+                  width={40}
+                  options={deviceQueryOptions}
+                  value={query.deviceID}
+                  defaultValue={query.deviceID}
+                  isSearchable={true}
+                  isClearable={true}
+                  isMulti={false}
+                  backspaceRemovesValue={false}
+                  allowCustomValue={true}
+                  menuPlacement="auto"
+                  onChange={(v) => {
+                    updateQuery('deviceID', v);
+                  }}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Size">
+                <Input
+                  width={20}
+                  name="Size"
+                  onBlur={(e) => updateQuery('size', e.target.value)}
+                  value={query.size}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Page">
+                <Input
+                  width={20}
+                  name="Page"
+                  defaultValue={0}
+                  onBlur={(e) => updateQuery('page', e.target.value)}
+                  value={query.page}
+                />
+              </InlineField>
+            </InlineFieldRow>
+          </VerticalGroup>
         </>
       ),
     },
@@ -91,45 +113,47 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
       description: 'Grab All Objects Data from SevOne',
       content: (
         <>
-          <InlineFieldRow>
-            <InlineField label="Devices">
-              <Select
-                width={40}
-                options={deviceQueryOptions}
-                value={query.deviceID}
-                defaultValue={query.deviceID}
-                isSearchable={true}
-                isClearable={true}
-                isMulti={false}
-                backspaceRemovesValue={false}
-                allowCustomValue={true}
-                menuPlacement="auto"
-                onChange={(v) => {
-                  updateQuery('deviceID', v);
-                }}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Size">
-              <Input
-                width={20}
-                name="Size"
-                defaultValue={query.size}
-                onBlur={(e) => updateQuery('size', e.target.value)}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Page">
-              <Input
-                width={20}
-                name="Page"
-                defaultValue={query.page}
-                onBlur={(e) => updateQuery('page', e.target.value)}
-              />
-            </InlineField>
-          </InlineFieldRow>
+          <VerticalGroup justify="space-between">
+            <InlineFieldRow>
+              <InlineField label="Devices">
+                <Select
+                  width={40}
+                  options={deviceQueryOptions}
+                  value={query.deviceID}
+                  defaultValue={query.deviceID}
+                  isSearchable={true}
+                  isClearable={true}
+                  isMulti={false}
+                  backspaceRemovesValue={false}
+                  allowCustomValue={true}
+                  menuPlacement="auto"
+                  onChange={(v) => {
+                    updateQuery('deviceID', v);
+                  }}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Size">
+                <Input
+                  width={20}
+                  name="Size"
+                  defaultValue={query.size}
+                  onBlur={(e) => updateQuery('size', e.target.value)}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Page">
+                <Input
+                  width={20}
+                  name="Page"
+                  defaultValue={0}
+                  onBlur={(e) => updateQuery('page', e.target.value)}
+                />
+              </InlineField>
+            </InlineFieldRow>
+          </VerticalGroup>
         </>
       ),
     },
@@ -138,67 +162,69 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
       description: 'Grab All Indicators Data from SevOne',
       content: (
         <>
-          <InlineFieldRow>
-            <InlineField label="Devices">
-              <Select
-                width={40}
-                options={deviceQueryOptions}
-                value={query.deviceID}
-                defaultValue={query.deviceID}
-                isSearchable={true}
-                isClearable={true}
-                isMulti={false}
-                backspaceRemovesValue={false}
-                allowCustomValue={true}
-                menuPlacement="auto"
-                onChange={(v) => {
-                  updateQuery('deviceID', v);
-                  if(v){
-                    getObjects(v.value);
-                  }
-                }}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Object">
-              <Select
-                width={40}
-                options={objectQueryOptions}
-                value={query.objectID}
-                defaultValue={query.objectID}
-                isSearchable={true}
-                isClearable={true}
-                isMulti={false}
-                backspaceRemovesValue={false}
-                allowCustomValue={true}
-                menuPlacement="auto"
-                onChange={(v) => {
-                  updateQuery('objectID', v);
-                }}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Size">
-              <Input
-                width={20}
-                name="Size"
-                defaultValue={query.size}
-                onBlur={(e) => updateQuery('size', e.target.value)}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Page">
-              <Input
-                width={20}
-                name="Page"
-                defaultValue={query.page}
-                onBlur={(e) => updateQuery('page', e.target.value)}
-              />
-            </InlineField>
-          </InlineFieldRow>
+          <VerticalGroup justify="space-between">
+            <InlineFieldRow>
+              <InlineField label="Devices">
+                <Select
+                  width={40}
+                  options={deviceQueryOptions}
+                  value={query.deviceID}
+                  defaultValue={query.deviceID}
+                  isSearchable={true}
+                  isClearable={true}
+                  isMulti={false}
+                  backspaceRemovesValue={false}
+                  allowCustomValue={true}
+                  menuPlacement="auto"
+                  onChange={(v) => {
+                    updateQuery('deviceID', v);
+                    if(v){
+                      getObjects(v.value);
+                    }
+                  }}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Object">
+                <Select
+                  width={40}
+                  options={objectQueryOptions}
+                  value={query.objectID}
+                  defaultValue={query.objectID}
+                  isSearchable={true}
+                  isClearable={true}
+                  isMulti={false}
+                  backspaceRemovesValue={false}
+                  allowCustomValue={true}
+                  menuPlacement="auto"
+                  onChange={(v) => {
+                    updateQuery('objectID', v);
+                  }}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Size">
+                <Input
+                  width={20}
+                  name="Size"
+                  defaultValue={query.size}
+                  onBlur={(e) => updateQuery('size', e.target.value)}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Page">
+                <Input
+                  width={20}
+                  name="Page"
+                  defaultValue={0}
+                  onBlur={(e) => updateQuery('page', e.target.value)}
+                />
+              </InlineField>
+            </InlineFieldRow>
+          </VerticalGroup>
         </>
       ),
     },
@@ -207,69 +233,71 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
       description: 'Grab the Indicator Data from SevOne',
       content: (
         <>
-          <InlineFieldRow>
-            <InlineField label="Devices">
-              <Select
-                width={40}
-                options={deviceQueryOptions}
-                value={query.deviceID}
-                defaultValue={query.deviceID}
-                isSearchable={true}
-                isClearable={true}
-                isMulti={false}
-                backspaceRemovesValue={false}
-                allowCustomValue={true}
-                menuPlacement="auto"
-                onChange={(v) => {
-                  updateQuery('deviceID', v);
-                  if(v){
-                    getObjects(v.value);
-                  }
-                }}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Object">
-              <Select
-                width={40}
-                options={objectQueryOptions}
-                value={query.objectID}
-                defaultValue={query.objectID}
-                isSearchable={true}
-                isClearable={true}
-                isMulti={false}
-                backspaceRemovesValue={false}
-                allowCustomValue={true}
-                menuPlacement="auto"
-                onChange={(v) => {
-                  updateQuery('objectID', v);
-                  if(v){
-                    getIndicators(query.deviceID.value,v.value);
-                  }
-                }}
-              />
-            </InlineField>
-          </InlineFieldRow>
-          <InlineFieldRow>
-            <InlineField label="Indicator">
-              <Select
-                width={40}
-                options={indicatorQueryOptions}
-                value={query.indicatorID}
-                defaultValue={query.indicatorID}
-                isSearchable={true}
-                isClearable={true}
-                isMulti={false}
-                backspaceRemovesValue={false}
-                allowCustomValue={true}
-                menuPlacement="auto"
-                onChange={(v) => {
-                  updateQuery('indicatorID', v);
-                }}
-              />
-            </InlineField>
-          </InlineFieldRow>
+          <VerticalGroup justify="space-between">
+            <InlineFieldRow>
+              <InlineField label="Devices">
+                <Select
+                  width={40}
+                  options={deviceQueryOptions}
+                  value={query.deviceID}
+                  defaultValue={query.deviceID}
+                  isSearchable={true}
+                  isClearable={true}
+                  isMulti={false}
+                  backspaceRemovesValue={false}
+                  allowCustomValue={true}
+                  menuPlacement="auto"
+                  onChange={(v) => {
+                    updateQuery('deviceID', v);
+                    if(v){
+                      getObjects(v.value);
+                    }
+                  }}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Object">
+                <Select
+                  width={40}
+                  options={objectQueryOptions}
+                  value={query.objectID}
+                  defaultValue={query.objectID}
+                  isSearchable={true}
+                  isClearable={true}
+                  isMulti={false}
+                  backspaceRemovesValue={false}
+                  allowCustomValue={true}
+                  menuPlacement="auto"
+                  onChange={(v) => {
+                    updateQuery('objectID', v);
+                    if(v){
+                      getIndicators(query.deviceID.value,v.value);
+                    }
+                  }}
+                />
+              </InlineField>
+            </InlineFieldRow>
+            <InlineFieldRow>
+              <InlineField label="Indicator">
+                <Select
+                  width={40}
+                  options={indicatorQueryOptions}
+                  value={query.indicatorID}
+                  defaultValue={query.indicatorID}
+                  isSearchable={true}
+                  isClearable={true}
+                  isMulti={false}
+                  backspaceRemovesValue={false}
+                  allowCustomValue={true}
+                  menuPlacement="auto"
+                  onChange={(v) => {
+                    updateQuery('indicatorID', v);
+                  }}
+                />
+              </InlineField>
+            </InlineFieldRow>
+          </VerticalGroup>
         </>
       ),
     },
@@ -287,7 +315,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
 
   return (
     <div className="gf-form">
-    <HorizontalGroup justify="space-between">
+    <VerticalGroup justify="space-between">
       <InlineFieldRow>
         <InlineField label="Query Category">
           <Select
@@ -297,13 +325,17 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
             menuPlacement="bottom"
             maxMenuHeight={220}
             onChange={(v) => {
+              query.deviceID = null;
+              query.objectID = null;
+              query.indicatorID = null;
+              setObjectQueryOptions([{}])
               updateQuery('selectedQueryCategory', v);
             }}
           />
         </InlineField>
       </InlineFieldRow>
-    </HorizontalGroup>
-    {query.selectedQueryCategory != null && options[query.selectedQueryCategory.value ?? ''].content}
+      {query.selectedQueryCategory != null && options[query.selectedQueryCategory.value ?? ''].content}
+    </VerticalGroup>
   </div>
   );
 }

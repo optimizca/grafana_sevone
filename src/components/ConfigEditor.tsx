@@ -9,11 +9,6 @@ export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
 
   const onChangeJsonData = (key: any, value: any) => {
-    // if(key === "url"){
-    //   if(value.slice(-1) === "/"){
-    //     value = value.slice(0,-1)
-    //   }
-    // }
     onOptionsChange({
       ...options,
       jsonData: {
@@ -69,7 +64,7 @@ export function ConfigEditor(props: Props) {
           width={40}
         />
       </InlineField>
-      <InlineField label="Client Secret" labelWidth={16}>
+      <InlineField label="Password" labelWidth={16}>
         <SecretInput
           isConfigured={options.jsonData && options.jsonData.passwordSecretActive}
           value={options.jsonData.password || ''}
