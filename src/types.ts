@@ -37,3 +37,11 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
  */
 export interface MySecureJsonData {
 }
+
+export interface MyVariableQuery {
+  selectedQueryCategory: string;
+  deviceID: string;
+  objectID: string;
+  page: number;
+  size: number;
+}

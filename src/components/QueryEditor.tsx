@@ -15,6 +15,8 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
   };
 
   let [deviceQueryOptions, setDeviceQueryOptions] = React.useState([{}]);
+  let [someDeviceQueryOptions, setSomeDeviceQueryOptions] = React.useState([{}]);
+  let [allDeviceQueryOptions, setAllDeviceQueryOptions] = React.useState([{}]);
   let [objectQueryOptions, setObjectQueryOptions] = React.useState([{}]);
   let [indicatorQueryOptions, setIndicatorsQueryOptions] = React.useState([{}]);
 
@@ -23,12 +25,20 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
       let token = '';
       token = await datasource.getToken();
       let parseJson = [{}];
+      let parseAllJson = [{}];
       let results = await datasource.sevOneConnection.getDevices(token,0,20,0);
+      let allResults = await datasource.sevOneConnection.getAllDevices(token,0);
       parseJson[0] = { label: results.content[0].name, value: results.content[0].id };
+      parseAllJson[0] = { label: allResults.content[0].name, value: allResults.content[0].id };
       for (let i = 1; i < results.content.length; i++) {
         parseJson.push({ label: results.content[i].name, value: results.content[i].id });
       }
+      for (let i = 1; i < allResults.content.length; i++) {
+        parseAllJson.push({ label: allResults.content[i].name, value: allResults.content[i].id });
+      }
       setDeviceQueryOptions(parseJson);
+      setAllDeviceQueryOptions(parseAllJson);
+      setSomeDeviceQueryOptions(parseJson);
     };
     getDevices();
   }, [datasource.sevOneConnection, datasource]);
@@ -57,6 +67,23 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
     setIndicatorsQueryOptions(parseJson);
   };
 
+  const parseData = (value: string | undefined) =>{
+    let count = 0;
+    const results = allDeviceQueryOptions.filter((device) => {
+      if(count < 20){
+        if(device.label.toLowerCase().includes(value?.toLowerCase())){
+          count ++;
+          return true;
+        }else{
+          return false;
+        }
+      }else{
+        return false;
+      }
+    })
+    setDeviceQueryOptions(results)
+  }
+
   const options: { [key: string]: { title: string; description: string; content: object } } = {
     Devices: {
       title: 'Devices',
@@ -80,6 +107,13 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                   onChange={(v) => {
                     updateQuery('deviceID', v);
                   }}
+                  onInputChange={(v) => {
+                    if(v){
+                      parseData(v);
+                    } else{
+                      setDeviceQueryOptions(someDeviceQueryOptions);
+                    }
+                  }}
                 />
               </InlineField>
             </InlineFieldRow>
@@ -100,7 +134,6 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                   name="Page"
                   defaultValue={0}
                   onBlur={(e) => updateQuery('page', e.target.value)}
-                  value={query.page}
                 />
               </InlineField>
             </InlineFieldRow>
@@ -129,6 +162,13 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                   menuPlacement="auto"
                   onChange={(v) => {
                     updateQuery('deviceID', v);
+                  }}
+                  onInputChange={(v) => {
+                    if(v){
+                      parseData(v);
+                    } else{
+                      setDeviceQueryOptions(someDeviceQueryOptions);
+                    }
                   }}
                 />
               </InlineField>
@@ -180,6 +220,13 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                     updateQuery('deviceID', v);
                     if(v){
                       getObjects(v.value);
+                    }
+                  }}
+                  onInputChange={(v) => {
+                    if(v){
+                      parseData(v);
+                    } else{
+                      setDeviceQueryOptions(someDeviceQueryOptions);
                     }
                   }}
                 />

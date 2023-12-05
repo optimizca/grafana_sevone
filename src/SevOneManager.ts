@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { MutableDataFrame, FieldType } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 
-import { TIME_FILED_NAMES } from './Constants.ts';
+import { TIME_FILED_NAMES } from './Constants';
 
 export class SevOneManager {
   apiPath: string;
@@ -24,6 +24,25 @@ export class SevOneManager {
     return result;
   }
 
+  async getAllDevices(token: any, queryType: number) {
+    let url = this.apiPath + `/api/v2/devices?includeCount=true&page=${0}&size=${10000}`;
+    let data = await this.request(url,token);
+    let loopRunsNum = data.data.totalPages - 1;
+    let results = {content:data.data.content}
+
+    for(let i = 1; i <= loopRunsNum; i++){
+      url = this.apiPath + `/api/v2/devices?includeCount=true&page=${i}&size=${10000}`;
+      data = await this.request(url,token);
+      results.content = results.content.concat(data.data.content)
+    }
+
+    if(queryType === 0){
+      return results;
+    }else{
+      return this.mapDataToVariable(results);
+    }
+  }
+
   async getDevice(token: any, deviceId: string) {
     let url = this.apiPath + `/api/v2/devices/${deviceId}`;
     let data = await this.request(url,token);
@@ -35,8 +54,10 @@ export class SevOneManager {
     let data = await this.request(url,token);
     if(queryType === 0){
       return data.data;
-    }else{
+    }else if (queryType === 1) {
       return this.mapDataToFrame(data);
+    }else {
+      return this.mapDataToVariable(data.data);
     }
   }
 
@@ -45,9 +66,11 @@ export class SevOneManager {
     let data = await this.request(url,token);
     if(queryType === 0){
       return data.data;
-    }else{
+    }else if (queryType === 1){
       return this.mapDataToFrame(data);
-   }
+    } else {
+      return this.mapDataToVariable(data.data);
+    }
   }
 
   async getIndicators(token: any, queryType: number, deviceId: string | undefined, objectId: string | undefined, size: number, page: number) {
@@ -55,8 +78,10 @@ export class SevOneManager {
     let data = await this.request(url,token);
     if(queryType === 0){
       return data.data;
-    }else{
+    }else if (queryType === 1){
       return this.mapDataToFrame(data);
+    } else {
+      return this.mapDataToVariable(data.data);
     }
   }
 
@@ -153,5 +178,14 @@ export class SevOneManager {
     }
 
     return frame;
+  }
+
+  async mapDataToVariable(result: any) {
+
+    let resultsparsed = result.content.map((row: any)=>{
+      return { text: row.name, value: row.id };
+    })
+
+    return resultsparsed;
   }
 }
