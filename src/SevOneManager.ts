@@ -143,7 +143,7 @@ export class SevOneManager {
           fieldType = FieldType.number;
         }
       }
-      
+
       frame.addField({
         name: filedNames[i],
         type: fieldType,

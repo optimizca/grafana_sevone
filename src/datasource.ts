@@ -31,7 +31,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     const connectionOptions = {
       url: this.url,
     };
-    
+
     this.username = instanceSettings.jsonData.username;
     this.password = instanceSettings.jsonData.password;
     this.sevOneConnection = new SevOneManager(connectionOptions);
@@ -65,7 +65,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     }
 
     let objectID = "";
-    
+
     if(query.objectID){
       objectID = getTemplateSrv().replace(query.objectID, options.scopedVars, 'csv');
       if(isNaN(+objectID)){
@@ -95,7 +95,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         page = query.page;
       }
     }
-    
+
     switch (queryType) {
       case 'Devices':
         if(query.page && query.size){
@@ -160,7 +160,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }
 
       let objectID = "";
-      
+
       if(typeof target.objectID === "object"){
         if(target.objectID !== null){
           objectID = getTemplateSrv().replace(target.objectID.value?.toString(), options.scopedVars, 'csv');
@@ -178,7 +178,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }
 
       let indicatorID = "";
-      
+
       if(typeof target.indicatorID === "object"){
         if(target.indicatorID !== null){
           indicatorID = getTemplateSrv().replace(target.indicatorID.value?.toString(), options.scopedVars, 'csv');
@@ -238,17 +238,12 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   async testDatasource() {
-    let token = '';
-
-    let tokenResponse = this.getToken();
-    await tokenResponse.then((response) =>{
-      token = response;
-    })
+    await this.getToken();
 
     return {
       status: 'success',
       message: 'Success',
-    };  
+    };
   }
 
   async getToken() {

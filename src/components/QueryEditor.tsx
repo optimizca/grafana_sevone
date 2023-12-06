@@ -69,7 +69,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
 
   const parseData = (value: string | undefined) =>{
     let count = 0;
-    const results = allDeviceQueryOptions.filter((device) => {
+    const results = allDeviceQueryOptions.filter((device: any) => {
       if(count < 20){
         if(device.label.toLowerCase().includes(value?.toLowerCase())){
           count ++;
@@ -318,7 +318,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                   menuPlacement="auto"
                   onChange={(v) => {
                     updateQuery('objectID', v);
-                    if(v){
+                    if(v && query.deviceID){
                       getIndicators(query.deviceID.value,v.value);
                     }
                   }}

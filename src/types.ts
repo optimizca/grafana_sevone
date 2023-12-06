@@ -2,9 +2,9 @@ import { DataQuery, DataSourceJsonData, SelectableValue  } from '@grafana/data';
 
 export interface MyQuery extends DataQuery {
   selectedQueryCategory: SelectableValue<string>;
-  deviceID: SelectableValue<number>;
-  objectID: SelectableValue<number>;
-  indicatorID: SelectableValue<number>;
+  deviceID: SelectableValue<number> | null;
+  objectID: SelectableValue<number> | null;
+  indicatorID: SelectableValue<number> | null;
   page: number;
   size: number;
 }
@@ -15,9 +15,9 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
     value: 'Application_Overview',
     description: 'Grab Application Overview',
   },
-  deviceID: [],
-  objectID: [],
-  indicatorID: [],
+  deviceID: {},
+  objectID: {},
+  indicatorID: {},
   page: 0,
   size: 20,
 };
