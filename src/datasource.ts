@@ -19,21 +19,18 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   url: string | undefined;
   username: string | undefined;
   password: string | undefined;
+  dsProxyUrl: string | undefined;
 
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
     super(instanceSettings);
-    if(instanceSettings.jsonData.url?.slice(-1) === "/"){
-      this.url = instanceSettings.jsonData.url.slice(0,-1)
-    }
-    else{
-      this.url = instanceSettings.jsonData.url;
-    }
+    this.dsProxyUrl = instanceSettings.url;
+    this.url = instanceSettings.jsonData.url;
+    this.username = instanceSettings.jsonData.username;
+
     const connectionOptions = {
-      url: this.url,
+      dsProxyUrl: this.dsProxyUrl
     };
 
-    this.username = instanceSettings.jsonData.username;
-    this.password = instanceSettings.jsonData.password;
     this.sevOneConnection = new SevOneManager(connectionOptions);
   }
 
@@ -247,24 +244,17 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   async getToken() {
-    let token = '';
-    if(this.username !== undefined && this.password !== undefined)
-    {
-      let url = this.url+"/api/v2/authentication/signin?nmsLogin=false";
-      let header = {"Content-Type": "application/json"};
-      let data = {
-        name:this.username,
-        password:this.password,
-      };
-
-      const result = await getBackendSrv().datasourceRequest({
-        url: url,
-        method: 'POST',
-        headers: header,
-        data: data
-      })
-      token = result.data.token;
+    if (this.url?.slice(-1) === "/") {
+      throw new Error("Please remove the trailing / from your URL and try again");
     }
+    let token = '';
+    let url = this.dsProxyUrl + "/authenticate";
+
+    const result = await getBackendSrv().datasourceRequest({
+      url: url,
+      method: 'POST',
+    });
+    token = result?.data.token || "";
     return token;
   }
 }

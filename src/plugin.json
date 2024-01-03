@@ -22,5 +22,19 @@
   "dependencies": {
     "grafanaDependency": ">=10.0.3",
     "plugins": []
-  }
+  },
+  "routes": [
+    {
+      "path": "api",
+      "url": "{{ .JsonData.url }}"
+    },
+    {
+      "path": "authenticate",
+      "url": "{{ .JsonData.url }}/api/v2/authentication/signin",
+      "body": {
+        "name": "{{ .JsonData.username }}",
+        "password": "{{ .SecureJsonData.password }}"
+      }
+    }
+  ]
 }

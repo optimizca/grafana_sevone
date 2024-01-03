@@ -1,9 +1,9 @@
 import React from 'react';
 import { InlineField, Input, SecretInput } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { MyDataSourceOptions } from '../types';
+import { MyDataSourceOptions, MySecureJsonData } from '../types';
 
-interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions> {}
+interface Props extends DataSourcePluginOptionsEditorProps<MyDataSourceOptions, MySecureJsonData> {}
 
 export function ConfigEditor(props: Props) {
   const { onOptionsChange, options } = props;
@@ -13,30 +13,32 @@ export function ConfigEditor(props: Props) {
       ...options,
       jsonData: {
         ...options.jsonData,
-        [key]: value,
+        [key]: value
       },
     });
   };
 
-  const onResetClientSecret = () => {
+  const onResetSecurePassword = () => {
     onOptionsChange({
       ...options,
-      jsonData: {
-        ...options.jsonData,
+      secureJsonData: {
         password: '',
-        passwordSecretActive: false,
       },
+      secureJsonFields: {
+        password: false
+      }
     });
   };
 
-  const onChangeClientSecret = (key: any, value: any) => {
+  const onChangeSecurePassword = (value: any) => {
     onOptionsChange({
       ...options,
-      jsonData: {
-        ...options.jsonData,
-        [key]: value,
-        passwordSecretActive: true,
+      secureJsonData: {
+        password: value,
       },
+      secureJsonFields: {
+        password: true
+      }
     });
   };
 
@@ -66,13 +68,12 @@ export function ConfigEditor(props: Props) {
       </InlineField>
       <InlineField label="Password" labelWidth={16}>
         <SecretInput
-          isConfigured={options.jsonData && options.jsonData.passwordSecretActive}
-          value={options.jsonData.password || ''}
+          isConfigured={options.secureJsonFields && options.secureJsonFields.password}
           placeholder="Password"
           width={40}
-          onReset={onResetClientSecret}
-          onChange={(e: any) => {
-            onChangeClientSecret('password', e.target.value);
+          onReset={onResetSecurePassword}
+          onBlur={(e: any) => {
+            onChangeSecurePassword(e.target.value);
           }}
         />
       </InlineField>
