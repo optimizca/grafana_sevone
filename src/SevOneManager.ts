@@ -113,12 +113,31 @@ export class SevOneManager {
       if(typeof values[0] === "boolean"){
         fieldType = FieldType.boolean;
       }
+      console.log(values)
+      console.log(typeof values[0])
+      console.log(values.every((value: any) => typeof value === "object"))
+      console.log(!values.every((value: any) => value === null))
 
-      frame.addField({
-        name: filedNames[i],
-        type: fieldType,
-        values: values,
-      });
+      if((values.every((value: any) => typeof value === "object")) && (!values.every((value: any) => value === null))){
+        let objectFiledNames = Object.keys(values[2]);
+        console.log(objectFiledNames)
+        for (let z = 0; z < objectFiledNames.length; z++) {
+          console.log(values[z][objectFiledNames[z]])
+          let objectValues = values.map((d: any) => d[objectFiledNames[z]]);
+          console.log(objectValues)
+          frame.addField({
+            name: filedNames[i]+"."+objectFiledNames[z],
+            type: FieldType.string,
+            values: objectValues,
+          });
+        }
+      }else{
+        frame.addField({
+          name: filedNames[i],
+          type: fieldType,
+          values: values,
+        });
+      }
     }
 
     return frame;
@@ -133,22 +152,24 @@ export class SevOneManager {
     }
     let filedNames = Object.keys(result.data[0]);
     for (let i = 0; i < filedNames.length; i++) {
-      let values = result.data.map((d: any) => d[filedNames[i]]);
+      if(filedNames[i] !== "focus"){
+        let values = result.data.map((d: any) => d[filedNames[i]]);
 
-      let fieldType = FieldType.string;
-      if(typeof values[0] === "number"){
-        if(TIME_FILED_NAMES.includes(filedNames[i])){
-          fieldType = FieldType.time;
-        }else{
-          fieldType = FieldType.number;
+        let fieldType = FieldType.string;
+        if(typeof values[0] === "number"){
+          if(TIME_FILED_NAMES.includes(filedNames[i])){
+            fieldType = FieldType.time;
+          }else{
+            fieldType = FieldType.number;
+          }
         }
-      }
 
-      frame.addField({
-        name: filedNames[i],
-        type: fieldType,
-        values: values,
-      });
+        frame.addField({
+          name: filedNames[i],
+          type: fieldType,
+          values: values,
+        });
+      }
     }
 
     return frame;

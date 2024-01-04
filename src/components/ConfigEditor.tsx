@@ -71,7 +71,7 @@ export function ConfigEditor(props: Props) {
           placeholder="Password"
           width={40}
           onReset={onResetClientSecret}
-          onChange={(e: any) => {
+          onBlur={(e: any) => {
             onChangeClientSecret('password', e.target.value);
           }}
         />

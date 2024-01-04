@@ -92,7 +92,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
         <>
           <VerticalGroup justify="space-between">
             <InlineFieldRow>
-              <InlineField label="Devices">
+              <InlineField label="Devices" labelWidth={15}>
                 <Select
                   width={40}
                   options={deviceQueryOptions}
@@ -118,9 +118,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Size">
+              <InlineField label="Size" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Size"
                   onBlur={(e) => updateQuery('size', e.target.value)}
                   value={query.size}
@@ -128,9 +128,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Page">
+              <InlineField label="Page" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Page"
                   defaultValue={0}
                   onBlur={(e) => updateQuery('page', e.target.value)}
@@ -148,7 +148,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
         <>
           <VerticalGroup justify="space-between">
             <InlineFieldRow>
-              <InlineField label="Devices">
+              <InlineField label="Devices" labelWidth={15}>
                 <Select
                   width={40}
                   options={deviceQueryOptions}
@@ -174,9 +174,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Size">
+              <InlineField label="Size" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Size"
                   defaultValue={query.size}
                   onBlur={(e) => updateQuery('size', e.target.value)}
@@ -184,9 +184,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Page">
+              <InlineField label="Page" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Page"
                   defaultValue={0}
                   onBlur={(e) => updateQuery('page', e.target.value)}
@@ -204,7 +204,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
         <>
           <VerticalGroup justify="space-between">
             <InlineFieldRow>
-              <InlineField label="Devices">
+              <InlineField label="Devices" labelWidth={15}>
                 <Select
                   width={40}
                   options={deviceQueryOptions}
@@ -233,7 +233,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Object">
+              <InlineField label="Object" labelWidth={15}>
                 <Select
                   width={40}
                   options={objectQueryOptions}
@@ -252,9 +252,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Size">
+              <InlineField label="Size" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Size"
                   defaultValue={query.size}
                   onBlur={(e) => updateQuery('size', e.target.value)}
@@ -262,9 +262,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Page">
+              <InlineField label="Page" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Page"
                   defaultValue={0}
                   onBlur={(e) => updateQuery('page', e.target.value)}
@@ -276,13 +276,13 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
       ),
     },
     IndicatorData: {
-      title: 'Indicator Data',
-      description: 'Grab the Indicator Data from SevOne',
+      title: 'Indicator Metric',
+      description: 'Grab the Indicator Metric from SevOne',
       content: (
         <>
           <VerticalGroup justify="space-between">
             <InlineFieldRow>
-              <InlineField label="Devices">
+              <InlineField label="Devices" labelWidth={15}>
                 <Select
                   width={40}
                   options={deviceQueryOptions}
@@ -304,7 +304,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Object">
+              <InlineField label="Object" labelWidth={15}>
                 <Select
                   width={40}
                   options={objectQueryOptions}
@@ -326,7 +326,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Indicator">
+              <InlineField label="Indicator" labelWidth={15}>
                 <Select
                   width={40}
                   options={indicatorQueryOptions}
@@ -364,7 +364,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
     <div className="gf-form">
     <VerticalGroup justify="space-between">
       <InlineFieldRow>
-        <InlineField label="Query Category">
+        <InlineField label="Query Category" labelWidth={15}>
           <Select
             width={40}
             options={getQueryCategories()}
@@ -372,9 +372,6 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
             menuPlacement="bottom"
             maxMenuHeight={220}
             onChange={(v) => {
-              query.deviceID = null;
-              query.objectID = null;
-              query.indicatorID = null;
               setObjectQueryOptions([{}])
               updateQuery('selectedQueryCategory', v);
             }}

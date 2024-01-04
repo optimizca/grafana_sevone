@@ -1,21 +1,31 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
   "type": "datasource",
-  "name": "Sev One",
+  "name": "Optimiz-SevOne Plugin",
   "id": "optimiz-sevone-datasource",
   "metrics": true,
   "info": {
-    "description": "",
+    "description": "Open-source SevOne plugin developed by Optimiz",
     "author": {
       "name": "Optimiz"
     },
-    "keywords": ["datasource"],
+    "keywords": ["datasource", "optimiz", "Optimiz"],
     "logos": {
-      "small": "img/logo.svg",
-      "large": "img/logo.svg"
+      "small": "img/sevone.svg",
+      "large": "img/sevone.svg"
     },
-    "links": [],
-    "screenshots": [],
+    "links": [
+      {
+        "name": "Github",
+        "url": "https://github.com/optimizca/grafana_sevone"
+      }
+    ],
+    "screenshots": [
+      {
+        "name": "Object",
+        "path": "img/object.png"
+      }
+    ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },

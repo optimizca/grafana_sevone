@@ -29,9 +29,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
         <>
           <VerticalGroup justify="space-between">
             <InlineFieldRow>
-              <InlineField label="Size">
+              <InlineField label="Size" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Size"
                   onChange={(v: any) => handleChange('size', v.target.value)}
                   onBlur={saveQuery}
@@ -40,9 +40,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Page">
+              <InlineField label="Page" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Page"
                   onChange={(v: any) => handleChange('page', v.target.value)}
                   onBlur={saveQuery}
@@ -61,9 +61,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
         <>
           <VerticalGroup justify="space-between">
             <InlineFieldRow>
-              <InlineField label="Device">
+              <InlineField label="Device" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Device"
                   value={state.deviceID}
                   onChange={(v: any) => handleChange('deviceID', v.target.value)}
@@ -72,9 +72,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Size">
+              <InlineField label="Size" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Size"
                   onChange={(v: any) => handleChange('size', v.target.value)}
                   onBlur={saveQuery}
@@ -83,9 +83,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Page">
+              <InlineField label="Page" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Page"
                   onChange={(v: any) => handleChange('page', v.target.value)}
                   onBlur={saveQuery}
@@ -104,9 +104,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
         <>
           <VerticalGroup justify="space-between">
             <InlineFieldRow>
-              <InlineField label="Device">
+              <InlineField label="Device" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Device"
                   value={state.deviceID}
                   onChange={(v: any) => handleChange('deviceID', v.target.value)}
@@ -115,9 +115,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Object">
+              <InlineField label="Object" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Object"
                   value={state.objectID}
                   onChange={(v: any) => handleChange('objectID', v.target.value)}
@@ -126,9 +126,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Size">
+              <InlineField label="Size" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Size"
                   onChange={(v: any) => handleChange('size', v.target.value)}
                   onBlur={saveQuery}
@@ -137,9 +137,9 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
               </InlineField>
             </InlineFieldRow>
             <InlineFieldRow>
-              <InlineField label="Page">
+              <InlineField label="Page" labelWidth={15}>
                 <Input
-                  width={20}
+                  width={40}
                   name="Page"
                   onChange={(v: any) => handleChange('page', v.target.value)}
                   onBlur={saveQuery}
@@ -167,7 +167,7 @@ export const VariableQueryEditor = ({ onChange, query }: VariableQueryProps) => 
     <>
       <VerticalGroup justify="space-between">
         <InlineFieldRow>
-          <InlineField label="Query Category">
+          <InlineField label="Query Category" labelWidth={15}>
             <Select
               width={40}
               options={getQueryCategories()}

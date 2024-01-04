@@ -1,50 +1,63 @@
-<!-- This README file is going to be the one displayed on the Grafana.com website for your plugin. Uncomment and replace the content here before publishing.
+# SevOne
 
-Remove any remaining comments before publishing as these may be displayed on Grafana.com -->
-# Sev One
+This SevOne Grafana Datasource Plugin enables communication between Grafana and SevOne to pull Device data, Object data, Indicator data, and Indicator metrics your instance.
 
+# Setup Instructions
 
+## Step 1: Install Grafana Plugin
 
-<!-- To help maximize the impact of your README and improve usability for users, we propose the following loose structure:
+Download or clone the repository and move the unzipped folder into your Grafana plugins folder.
 
-**BEFORE YOU BEGIN**
-- Ensure all links are absolute URLs so that they will work when the README is displayed within Grafana and Grafana.com
-- Be inspired ✨ 
-  - [grafana-polystat-panel](https://github.com/grafana/grafana-polystat-panel)
-  - [volkovlabs-variable-panel](https://github.com/volkovlabs/volkovlabs-variable-panel)
+Add our plugin to the list of unsigned plugins in your Grafana configuration file then restart Grafana.
+```
+allow_loading_unsigned_plugins = optimiz-sevone-datasource
+```
 
-**ADD SOME BADGES**
+## Step 2: Grafana Datasource Configuration
 
-Badges convey useful information at a glance for users whether in the Catalog or viewing the source code. You can use the generator on [Shields.io](https://shields.io/badges/dynamic-json-badge) together with the Grafana.com API 
-to create dynamic badges that update automatically when you publish a new version to the marketplace.
+1. Open Grafana Configuration => Data Sources
+2. Click on the "Add data source" Button
+3. Search for and add our "Optimiz-SevOne Plugin"
+4. Configure the data source based on fields below. All fields listed below are Required
 
-- For the logo field use 'grafana'.
-- Examples (label: query)
-  - Downloads: $.downloads
-  - Catalog Version: $.version
-  - Grafana Dependency: $.grafanaDependency
-  - Signature Type: $.versionSignatureType
+- URL: Enter the URL of the SevOne instance
+- Username: Enter a username that can access the SevOne instance
+- Password: Enter password of user
 
-Full example: ![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?logo=grafana&query=$.version&url=https://grafana.com/api/plugins/grafana-polystat-panel&label=Marketplace&prefix=v&color=F47A20)
+5. Click on the "Save & Test" Button. If you get the message "Data source connection is successful" then the plugin is ready to use!
 
-Consider other [badges](https://shields.io/badges) as you feel appropriate for your project.
+# Query Categories
 
-## Overview / Introduction
-Provide one or more paragraphs as an introduction to your plugin to help users understand why they should use it.  
+- [Devices](#devices)
+- [Object](#object)
+- [Indicators](#indicators)
+- [Indicators Metrics](#indicators-metric)
 
-Consider including screenshots:
-- in [plugin.json](https://grafana.com/docs/grafana/latest/developers/plugins/metadata/#info) include them as relative links.
-- in the README ensure they are absolute URLs.
+## Devices
+| Option Name | Description | Options | Additional Info |
+| ----------- | ----------- | ------- | --------------- |
+| Devices | Selecting a Device will only return the data of the specified Device. If no Device is selected then the query will return all Device data. | Device Name or ID | Not Required for this Query Category |
+| Size | Limits the amount of records returned to the number submitted | 1-10000 | Default is 10 |
+| Page | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999 | Default is 0, which is the first page |
 
-## Requirements
-List any requirements or dependencies they may need to run the plugin.
+## Object
+| Option Name | Description | Options | Additional Info |
+| ----------- | ----------- | ------- | --------------- |
+| Devices | Selecting a Device will return all the Objects connected to the specified Device | Device Name or ID | Required for this Query Category |
+| Size | Limits the amount of records returned to the number submitted | 1-10000 | Default is 10 |
+| Page | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999 | Default is 0, which is the first page |
 
-## Getting Started
-Provide a quick start on how to configure and use the plugin.
+## Indicators
+| Option Name | Description | Options | Additional Info |
+| ----------- | ----------- | ------- | --------------- |
+| Devices | Selecting a Device will fill in the Object field with Objects connected to the specificed Device | Device Name or ID | Required for this Query Category |
+| Object | Selecting a Object will return all the Indicators data connected to the specified Device and the specified Object | Object Name or ID | Required for this Query Category |
+| Size | Limits the amount of records returned to the number submitted | 1-10000 | Default is 10 |
+| Page | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999 | Default is 0, which is the first page |
 
-## Documentation
-If your project has dedicated documentation available for users, provide links here. For help in following Grafana's style recommendations for technical documentation, refer to our [Writer's Toolkit](https://grafana.com/docs/writers-toolkit/).
-
-## Contributing
-Do you want folks to contribute to the plugin or provide feedback through specific means? If so, tell them how!
--->
+## Indicators Metrics
+| Option Name | Description | Options | Additional Info |
+| ----------- | ----------- | ------- | --------------- |
+| Devices | Selecting a Device will fill in the Object field with Objects connected to the specificed Device | Device Name or ID | Required for this Query Category |
+| Object | Selecting a Object will fill in the Indicator field with Indicator connected to the specificed Device and the specificed Object| Object Name or ID | Required for this Query Category |
+| Indicator | Selecting a Indicator will return the Indicators metrics connected to the specified Device, the specified Object, and the specified Indicator | Indicator Name or ID | Required for this Query Category |
