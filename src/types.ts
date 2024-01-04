@@ -28,14 +28,13 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
 export interface MyDataSourceOptions extends DataSourceJsonData {
   url?: string;
   username?: string;
-  password?: string;
-  passwordSecretActive: boolean;
 }
 
 /**
  * Value that is used in the backend, but never sent over HTTP to the frontend
  */
 export interface MySecureJsonData {
+  password?: string;
 }
 
 export interface MyVariableQuery {

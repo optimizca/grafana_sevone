@@ -372,7 +372,6 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
             menuPlacement="bottom"
             maxMenuHeight={220}
             onChange={(v) => {
-              setObjectQueryOptions([{}])
               updateQuery('selectedQueryCategory', v);
             }}
           />

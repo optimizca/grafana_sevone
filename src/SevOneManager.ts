@@ -5,19 +5,19 @@ import { getBackendSrv } from '@grafana/runtime';
 import { TIME_FILED_NAMES } from './Constants';
 
 export class SevOneManager {
-  apiPath: string;
+  dsProxyUrl: string;
 
   constructor(options: any) {
-    this.apiPath = options.url;
+    this.dsProxyUrl = options.dsProxyUrl;
   }
 
-  async request(url: string, token: any) {
+  async request(endpoint: string, token: any) {
     let header = {}
     if(token !== ""){
       header = {"X-AUTH-TOKEN":token};
     }
     const result = getBackendSrv().datasourceRequest({
-      url: url,
+      url: this.dsProxyUrl + "/api" + endpoint,
       method: 'GET',
       headers: header,
     });
@@ -25,13 +25,13 @@ export class SevOneManager {
   }
 
   async getAllDevices(token: any, queryType: number) {
-    let url = this.apiPath + `/api/v2/devices?includeCount=true&page=${0}&size=${10000}`;
+    let url = `/api/v2/devices?includeCount=true&page=${0}&size=${10000}`;
     let data = await this.request(url,token);
     let loopRunsNum = data.data.totalPages - 1;
     let results = {content:data.data.content}
 
     for(let i = 1; i <= loopRunsNum; i++){
-      url = this.apiPath + `/api/v2/devices?includeCount=true&page=${i}&size=${10000}`;
+      url = `/api/v2/devices?includeCount=true&page=${i}&size=${10000}`;
       data = await this.request(url,token);
       results.content = results.content.concat(data.data.content)
     }
@@ -44,13 +44,13 @@ export class SevOneManager {
   }
 
   async getDevice(token: any, deviceId: string) {
-    let url = this.apiPath + `/api/v2/devices/${deviceId}`;
+    let url = `/api/v2/devices/${deviceId}`;
     let data = await this.request(url,token);
     return this.mapDeviceDataToFrame(data);
   }
 
   async getDevices(token: any, queryType: number, size: number, page: number) {
-    let url = this.apiPath + `/api/v2/devices?includeCount=false&page=${page}&size=${size}`;
+    let url = `/api/v2/devices?includeCount=false&page=${page}&size=${size}`;
     let data = await this.request(url,token);
     if(queryType === 0){
       return data.data;
@@ -62,7 +62,7 @@ export class SevOneManager {
   }
 
   async getObjects(token: any, queryType: number, deviceId: string | undefined, size: number, page: number) {
-    let url = this.apiPath + `/api/v2/devices/${deviceId}/objects?page=${page}&size=${size}`;
+    let url = `/api/v2/devices/${deviceId}/objects?page=${page}&size=${size}`;
     let data = await this.request(url,token);
     if(queryType === 0){
       return data.data;
@@ -74,7 +74,7 @@ export class SevOneManager {
   }
 
   async getIndicators(token: any, queryType: number, deviceId: string | undefined, objectId: string | undefined, size: number, page: number) {
-    let url = this.apiPath + `/api/v2/devices/${deviceId}/objects/${objectId}/indicators?page=${page}&size=${size}`;
+    let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators?page=${page}&size=${size}`;
     let data = await this.request(url,token);
     if(queryType === 0){
       return data.data;
@@ -86,7 +86,7 @@ export class SevOneManager {
   }
 
   async getIndicatorData(token: any, deviceId: string | undefined, objectId: string | undefined, indicatorId: string | undefined, starttime: number | undefined, endtime: number | undefined) {
-    let url = this.apiPath + `/api/v2/devices/${deviceId}/objects/${objectId}/indicators/${indicatorId}/data?endTime=${endtime}&startTime=${starttime}`;
+    let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators/${indicatorId}/data?endTime=${endtime}&startTime=${starttime}`;
     let data = await this.request(url,token);
     return this.mapIndicatorDataToFrame(data);
   }
