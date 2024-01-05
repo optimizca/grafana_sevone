@@ -106,6 +106,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                   menuPlacement="auto"
                   onChange={(v) => {
                     updateQuery('deviceID', v);
+                    if(v){
+                      getObjects(v.value);
+                    }
                   }}
                   onInputChange={(v) => {
                     if(v){
@@ -162,6 +165,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                   menuPlacement="auto"
                   onChange={(v) => {
                     updateQuery('deviceID', v);
+                    if(v){
+                      getObjects(v.value);
+                    }
                   }}
                   onInputChange={(v) => {
                     if(v){
@@ -247,6 +253,9 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
                   menuPlacement="auto"
                   onChange={(v) => {
                     updateQuery('objectID', v);
+                    if(v && query.deviceID){
+                      getIndicators(query.deviceID.value,v.value);
+                    }
                   }}
                 />
               </InlineField>

@@ -190,21 +190,23 @@ export class SevOneManager {
     });
     let filedNames = Object.keys(result.data);
     for (let i = 0; i < filedNames.length; i++) {
-      let values = [result.data[filedNames[i]]];
-      let fieldType = FieldType.string;
-      if(typeof values === "number"){
-        if(TIME_FILED_NAMES.includes(filedNames[i])){
-          fieldType = FieldType.time;
-        }else{
-          fieldType = FieldType.number;
+      if(filedNames[i] !== "pluginInfo"){
+        let values = [result.data[filedNames[i]]];
+        let fieldType = FieldType.string;
+        if(typeof values === "number"){
+          if(TIME_FILED_NAMES.includes(filedNames[i])){
+            fieldType = FieldType.time;
+          }else{
+            fieldType = FieldType.number;
+          }
         }
-      }
 
-      frame.addField({
-        name: filedNames[i],
-        type: fieldType,
-        values: values,
-      });
+        frame.addField({
+          name: filedNames[i],
+          type: fieldType,
+          values: values,
+        });
+      }
     }
 
     return frame;
