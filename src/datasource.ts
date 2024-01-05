@@ -203,6 +203,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       if(typeof target.page === "string"){
         page = target.page;
       }
+
       switch (queryType) {
         case 'Devices':
           if(typeof target.deviceID === "object"){
@@ -211,6 +212,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
             }else{
               return this.sevOneConnection.getDevices(token,1,size,page);
             }
+          }else{
+            return this.sevOneConnection.getDevices(token,1,size,page);
           }
         case 'Objects':
           return this.sevOneConnection.getObjects(token,1,deviceID,size,page);

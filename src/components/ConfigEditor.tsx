@@ -66,7 +66,7 @@ export function ConfigEditor(props: Props) {
           width={40}
         />
       </InlineField>
-      <InlineField label="Password" labelWidth={16}>
+      <InlineField label="Password" labelWidth={12}>
         <SecretInput
           isConfigured={options.secureJsonFields && options.secureJsonFields.password}
           placeholder="Password"

@@ -113,18 +113,27 @@ export class SevOneManager {
       if(typeof values[0] === "boolean"){
         fieldType = FieldType.boolean;
       }
-      console.log(values)
-      console.log(typeof values[0])
-      console.log(values.every((value: any) => typeof value === "object"))
-      console.log(!values.every((value: any) => value === null))
 
       if((values.every((value: any) => typeof value === "object")) && (!values.every((value: any) => value === null))){
-        let objectFiledNames = Object.keys(values[2]);
-        console.log(objectFiledNames)
+        let objectFiledNames: string | string[] = [];
+        for(const value of values){
+          if(value !== null){
+            let keys = Object.keys(value)
+            for(const key of keys){
+              if(!objectFiledNames.includes(key)){
+                objectFiledNames.push(key)
+              }
+            }
+          }
+        }
         for (let z = 0; z < objectFiledNames.length; z++) {
-          console.log(values[z][objectFiledNames[z]])
-          let objectValues = values.map((d: any) => d[objectFiledNames[z]]);
-          console.log(objectValues)
+          let objectValues = values.map((d: any) => {
+            if(d !== null && objectFiledNames[z] in d){
+              return d[objectFiledNames[z]];
+            }else{
+              return null
+            }
+          });
           frame.addField({
             name: filedNames[i]+"."+objectFiledNames[z],
             type: FieldType.string,

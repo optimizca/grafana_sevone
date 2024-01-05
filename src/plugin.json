@@ -22,8 +22,19 @@
     ],
     "screenshots": [
       {
+        "name": "Devices",
+        "path": "img/device.png"
+      },
+      {
         "name": "Object",
         "path": "img/object.png"
+      },
+      {
+        "name": "Indicators",
+        "path": "img/indicator.png"
+      },{
+        "name": "Indicators Metrics",
+        "path": "img/indicatormetric.png"
       }
     ],
     "version": "%VERSION%",
