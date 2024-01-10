@@ -23,19 +23,19 @@
     "screenshots": [
       {
         "name": "Devices",
-        "path": "https://github.com/optimizca/grafana_sevone/raw/main/src/img/device.PNG"
+        "path": "img/device.PNG"
       },
       {
         "name": "Object",
-        "path": "https://github.com/optimizca/grafana_sevone/raw/main/src/img/object.PNG"
+        "path": "img/object.PNG"
       },
       {
         "name": "Indicators",
-        "path": "https://github.com/optimizca/grafana_sevone/raw/main/src/img/indicator.PNG"
+        "path": "img/indicator.PNG"
       },
       {
         "name": "Indicators Metrics",
-        "path": "https://github.com/optimizca/grafana_sevone/raw/main/src/img/indicatormetric.PNG"
+        "path": "img/indicatormetric.PNG"
       }
     ],
     "version": "%VERSION%",
