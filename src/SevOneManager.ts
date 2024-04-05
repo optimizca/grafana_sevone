@@ -99,6 +99,18 @@ export class SevOneManager {
     }
   }
 
+  async getObjectID(token: any, deviceID: string, objectName: string) {
+    let url = `/api/v2/devices/objects/filter`;
+    let body = { name: objectName, deviceIds: [+deviceID] };
+    let result: any = await this.postRequest(url, token, body);
+    let objectID = '0';
+    if (result.data.content && result.data.content.length > 0) {
+      objectID = result.data.content[0].id;
+    }
+    console.log('objectID: ', objectID);
+    return objectID;
+  }
+
   async getIndicators(
     token: any,
     queryType: number,

@@ -153,14 +153,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         if (target.objectID !== null) {
           objectID = getTemplateSrv().replace(target.objectID.value?.toString(), options.scopedVars, 'csv');
           if (isNaN(+objectID)) {
-            let objectData = this.sevOneConnection.getObjects(token, 0, deviceID, 20, 0);
-            await objectData.then((response) => {
-              for (const object of response.content) {
-                if (object.name === objectID) {
-                  objectID = object.id;
-                }
-              }
-            });
+            objectID = await this.sevOneConnection.getObjectID(token, deviceID, objectID);
           }
         }
       }
