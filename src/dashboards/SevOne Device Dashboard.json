@@ -1,0 +1,763 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_SEV_ONE",
+      "label": "Sev One",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "optimiz-sevone-datasource",
+      "pluginName": "Optimiz-SevOne Plugin"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.4.0"
+    },
+    {
+      "type": "datasource",
+      "id": "optimiz-sevone-datasource",
+      "name": "Optimiz-SevOne Plugin",
+      "version": "1.0.2"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "optimiz-sevone-datasource",
+        "uid": "${DS_SEV_ONE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "dateAdded"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocalNoDateIfToday"
+              },
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "lastDiscovery"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "dateTimeAsLocalNoDateIfToday"
+              },
+              {
+                "id": "custom.width",
+                "value": 200
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "id"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 76
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 178
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "alternateName"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 131
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ipAddress"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 136
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "pollFrequency"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 122
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "numElements"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 113
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "manualIP"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 88
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "isDeleted"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "isNew"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "allowDelete"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 99
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "isQueuedForDeletion"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 170
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "disablePolling"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 119
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "disableConcurrentPolling"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 190
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "disableThresholding"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 161
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "timezone"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 116
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "optimiz-sevone-datasource",
+            "uid": "${DS_SEV_ONE}"
+          },
+          "deviceID": {
+            "__isNew__": true,
+            "label": "$device",
+            "value": "$device"
+          },
+          "refId": "A",
+          "selectedQueryCategory": {
+            "description": "Grab All Devices Data from SevOne",
+            "label": "Devices",
+            "value": "Devices"
+          },
+          "size": "1"
+        }
+      ],
+      "title": "Device Details",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "allowDelete": 12,
+              "alternateName": 2,
+              "dateAdded": 6,
+              "description": 4,
+              "disableConcurrentPolling": 15,
+              "disablePolling": 14,
+              "disableThresholding": 16,
+              "id": 0,
+              "ipAddress": 3,
+              "ips15min": 25,
+              "ips1hour": 26,
+              "ips24hour": 29,
+              "ips2hour": 27,
+              "ips6hour": 28,
+              "ips7day": 30,
+              "ipsUpdateTime": 24,
+              "isDeleted": 10,
+              "isNew": 11,
+              "isQueuedForDeletion": 13,
+              "lastDiscovery": 7,
+              "manualIP": 9,
+              "name": 1,
+              "numElements": 8,
+              "objects": 20,
+              "peerId": 31,
+              "pluginInfo": 19,
+              "pluginManagerId": 21,
+              "pollFrequency": 5,
+              "queuedTime": 23,
+              "queuedUser": 22,
+              "timezone": 17,
+              "workhoursGroupId": 18
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "optimiz-sevone-datasource",
+        "uid": "${DS_SEV_ONE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "id"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 72
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 5,
+        "x": 0,
+        "y": 4
+      },
+      "id": 4,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "optimiz-sevone-datasource",
+            "uid": "${DS_SEV_ONE}"
+          },
+          "deviceID": {
+            "__isNew__": true,
+            "label": "$device",
+            "value": "$device"
+          },
+          "refId": "A",
+          "selectedQueryCategory": {
+            "description": "Grab All Objects Data from SevOne",
+            "label": "Objects",
+            "value": "Objects"
+          }
+        }
+      ],
+      "title": "Objects on $device",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "alternateName": true,
+              "deviceId": true,
+              "extendedInfo": true,
+              "id": false,
+              "indicators": true,
+              "isEnabled": true,
+              "pluginId": true,
+              "pluginObjectTypeId": true,
+              "subtypeId": true
+            },
+            "indexByName": {
+              "alternateName": 6,
+              "dateAdded": 13,
+              "description": 7,
+              "deviceId": 1,
+              "disabledByDDQ": 12,
+              "enabled": 8,
+              "extendedInfo": 15,
+              "id": 0,
+              "indicators": 14,
+              "isDeleted": 11,
+              "isEnabled": 9,
+              "isVisible": 10,
+              "name": 5,
+              "pluginId": 2,
+              "pluginObjectTypeId": 3,
+              "subtypeId": 4
+            },
+            "renameByName": {}
+          }
+        },
+        {
+          "disabled": true,
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "$object"
+                  }
+                },
+                "fieldName": "id"
+              }
+            ],
+            "match": "any",
+            "type": "include"
+          }
+        },
+        {
+          "disabled": true,
+          "id": "reduce",
+          "options": {
+            "reducers": [
+              "lastNotNull"
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "optimiz-sevone-datasource",
+        "uid": "${DS_SEV_ONE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 15,
+        "w": 19,
+        "x": 5,
+        "y": 4
+      },
+      "id": 3,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "optimiz-sevone-datasource",
+            "uid": "${DS_SEV_ONE}"
+          },
+          "deviceID": {
+            "__isNew__": true,
+            "label": "$device",
+            "value": "$device"
+          },
+          "indicatorID": {
+            "__isNew__": true,
+            "label": "$indicator",
+            "value": "$indicator"
+          },
+          "objectID": {
+            "__isNew__": true,
+            "label": "$object",
+            "value": "$object"
+          },
+          "refId": "A",
+          "selectedQueryCategory": {
+            "description": "Grab the Indicator Data from SevOne",
+            "label": "Indicator Data",
+            "value": "IndicatorData"
+          }
+        }
+      ],
+      "title": "$device - $object - $indicator Metric Data",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "value",
+                "time"
+              ]
+            }
+          }
+        }
+      ],
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "optimiz-sevone-datasource",
+          "uid": "${DS_SEV_ONE}"
+        },
+        "definition": "Devices (undefined) ()",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Device",
+        "multi": false,
+        "name": "device",
+        "options": [],
+        "query": {
+          "selectedQueryCategory": "Devices",
+          "size": ""
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "optimiz-sevone-datasource",
+          "uid": "${DS_SEV_ONE}"
+        },
+        "definition": "Objects (undefined) (1000)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Object",
+        "multi": false,
+        "name": "object",
+        "options": [],
+        "query": {
+          "deviceID": "$device",
+          "selectedQueryCategory": "Objects",
+          "size": "1000"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "optimiz-sevone-datasource",
+          "uid": "${DS_SEV_ONE}"
+        },
+        "definition": "Indicators (undefined) (undefined)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Indicator",
+        "multi": false,
+        "name": "indicator",
+        "options": [],
+        "query": {
+          "deviceID": "$device",
+          "objectID": "$object",
+          "selectedQueryCategory": "Indicators"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "SevOne Device Dashboard",
+  "uid": "ad1bd247-0084-4a22-b2b2-bac1cafa385d",
+  "version": 20,
+  "weekStart": ""
+}

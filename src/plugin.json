@@ -58,5 +58,12 @@
         "password": "{{ .SecureJsonData.password }}"
       }
     }
+  ],
+  "includes": [
+    {
+      "type": "dashboard",
+      "name": "SevOne Device Dashboard",
+      "path": "dashboards/SevOne Device Dashboard.json"
+    }
   ]
 }
