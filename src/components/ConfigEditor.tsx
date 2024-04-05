@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineField, Input, SecretInput } from '@grafana/ui';
+import { Checkbox, InlineField, Input, SecretInput } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
 import { MyDataSourceOptions, MySecureJsonData } from '../types';
 
@@ -13,7 +13,7 @@ export function ConfigEditor(props: Props) {
       ...options,
       jsonData: {
         ...options.jsonData,
-        [key]: value
+        [key]: value,
       },
     });
   };
@@ -25,8 +25,8 @@ export function ConfigEditor(props: Props) {
         password: '',
       },
       secureJsonFields: {
-        password: false
-      }
+        password: false,
+      },
     });
   };
 
@@ -37,8 +37,8 @@ export function ConfigEditor(props: Props) {
         password: value,
       },
       secureJsonFields: {
-        password: true
-      }
+        password: true,
+      },
     });
   };
 
@@ -74,6 +74,15 @@ export function ConfigEditor(props: Props) {
           onReset={onResetSecurePassword}
           onBlur={(e: any) => {
             onChangeSecurePassword(e.target.value);
+          }}
+        />
+      </InlineField>
+      <InlineField>
+        <Checkbox
+          label="Skip TLS cert validation"
+          description="Set to true if you want to skip TLS cert validation"
+          onChange={(e: any) => {
+            onChangeJsonData('tlsSkipVerify', e.target.checked);
           }}
         />
       </InlineField>

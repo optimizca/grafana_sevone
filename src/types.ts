@@ -28,6 +28,7 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
 export interface MyDataSourceOptions extends DataSourceJsonData {
   url?: string;
   username?: string;
+  tlsSkipVerify?: boolean;
 }
 
 /**
