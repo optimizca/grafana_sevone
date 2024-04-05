@@ -71,7 +71,6 @@ export class SevOneManager {
     if (result.data.content && result.data.content.length > 0) {
       deviceID = result.data.content[0].id;
     }
-    // console.log('DeviceID: ', deviceID);
     return deviceID;
   }
 
@@ -107,7 +106,6 @@ export class SevOneManager {
     if (result.data.content && result.data.content.length > 0) {
       objectID = result.data.content[0].id;
     }
-    console.log('objectID: ', objectID);
     return objectID;
   }
 

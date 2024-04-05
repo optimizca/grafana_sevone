@@ -50,14 +50,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     if (query.deviceID) {
       deviceID = getTemplateSrv().replace(query.deviceID, options.scopedVars, 'csv');
       if (isNaN(+deviceID)) {
-        let deviceData = this.sevOneConnection.getAllDevices(token, 0);
-        await deviceData.then((response) => {
-          for (const device of response.content) {
-            if (device.name === deviceID) {
-              deviceID = device.id;
-            }
-          }
-        });
+        deviceID = await this.sevOneConnection.getDeviceID(token, deviceID);
       }
     }
 
@@ -66,14 +59,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     if (query.objectID) {
       objectID = getTemplateSrv().replace(query.objectID, options.scopedVars, 'csv');
       if (isNaN(+objectID)) {
-        let objectData = this.sevOneConnection.getObjects(token, 0, deviceID, 20, 0);
-        await objectData.then((response) => {
-          for (const object of response.content) {
-            if (object.name === objectID) {
-              objectID = object.id;
-            }
-          }
-        });
+        objectID = await this.sevOneConnection.getObjectID(token, deviceID, objectID);
       }
     }
 
@@ -141,7 +127,6 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
       if (typeof target.deviceID === 'object' && target.deviceID !== null) {
         deviceID = getTemplateSrv().replace(target.deviceID.value?.toString(), options.scopedVars, 'csv');
-        console.log(deviceID);
         if (isNaN(+deviceID)) {
           deviceID = await this.sevOneConnection.getDeviceID(token, deviceID);
         }
@@ -149,12 +134,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
       let objectID = '';
 
-      if (typeof target.objectID === 'object') {
-        if (target.objectID !== null) {
-          objectID = getTemplateSrv().replace(target.objectID.value?.toString(), options.scopedVars, 'csv');
-          if (isNaN(+objectID)) {
-            objectID = await this.sevOneConnection.getObjectID(token, deviceID, objectID);
-          }
+      if (typeof target.objectID === 'object' && target.objectID !== null) {
+        objectID = getTemplateSrv().replace(target.objectID.value?.toString(), options.scopedVars, 'csv');
+        if (isNaN(+objectID)) {
+          objectID = await this.sevOneConnection.getObjectID(token, deviceID, objectID);
         }
       }
 
@@ -164,7 +147,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         if (target.indicatorID !== null) {
           indicatorID = getTemplateSrv().replace(target.indicatorID.value?.toString(), options.scopedVars, 'csv');
           if (isNaN(+indicatorID)) {
-            let indicatorData = this.sevOneConnection.getIndicators(token, 0, deviceID, objectID, 20, 0);
+            let indicatorData = this.sevOneConnection.getIndicators(token, 0, deviceID, objectID, 100, 0);
             await indicatorData.then((response) => {
               for (const indicator of response.content) {
                 if (indicator.name === indicatorID) {
