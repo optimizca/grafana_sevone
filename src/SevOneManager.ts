@@ -12,82 +12,122 @@ export class SevOneManager {
   }
 
   async request(endpoint: string, token: any) {
-    let header = {}
-    if(token !== ""){
-      header = {"X-AUTH-TOKEN":token};
+    let header = {};
+    if (token !== '') {
+      header = { 'X-AUTH-TOKEN': token };
     }
     const result = getBackendSrv().datasourceRequest({
-      url: this.dsProxyUrl + "/api" + endpoint,
+      url: this.dsProxyUrl + '/api' + endpoint,
       method: 'GET',
       headers: header,
     });
     return result;
   }
 
+  async postRequest(endpoint: string, token: any, body: any) {
+    let header = {};
+    if (token !== '') {
+      header = { 'X-AUTH-TOKEN': token };
+    }
+    const result = getBackendSrv().datasourceRequest({
+      url: this.dsProxyUrl + '/api' + endpoint,
+      method: 'POST',
+      headers: header,
+      data: body,
+    });
+    return result;
+  }
+
   async getAllDevices(token: any, queryType: number) {
     let url = `/api/v2/devices?includeCount=true&page=${0}&size=${10000}`;
-    let data = await this.request(url,token);
+    let data = await this.request(url, token);
     let loopRunsNum = data.data.totalPages - 1;
-    let results = {content:data.data.content}
+    let results = { content: data.data.content };
 
-    for(let i = 1; i <= loopRunsNum; i++){
+    for (let i = 1; i <= loopRunsNum; i++) {
       url = `/api/v2/devices?includeCount=true&page=${i}&size=${10000}`;
-      data = await this.request(url,token);
-      results.content = results.content.concat(data.data.content)
+      data = await this.request(url, token);
+      results.content = results.content.concat(data.data.content);
     }
 
-    if(queryType === 0){
+    if (queryType === 0) {
       return results;
-    }else{
+    } else {
       return this.mapDataToVariable(results);
     }
   }
 
   async getDevice(token: any, deviceId: string) {
     let url = `/api/v2/devices/${deviceId}`;
-    let data = await this.request(url,token);
+    let data = await this.request(url, token);
     return this.mapDeviceDataToFrame(data);
+  }
+
+  async getDeviceID(token: any, deviceName: string) {
+    let url = `/api/v2/devices/filter`;
+    let body = { name: deviceName };
+    let result: any = await this.postRequest(url, token, body);
+    let deviceID = '0';
+    if (result.data.content && result.data.content.length > 0) {
+      deviceID = result.data.content[0].id;
+    }
+    // console.log('DeviceID: ', deviceID);
+    return deviceID;
   }
 
   async getDevices(token: any, queryType: number, size: number, page: number) {
     let url = `/api/v2/devices?includeCount=false&page=${page}&size=${size}`;
-    let data = await this.request(url,token);
-    if(queryType === 0){
+    let data = await this.request(url, token);
+    if (queryType === 0) {
       return data.data;
-    }else if (queryType === 1) {
+    } else if (queryType === 1) {
       return this.mapDataToFrame(data);
-    }else {
+    } else {
       return this.mapDataToVariable(data.data);
     }
   }
 
   async getObjects(token: any, queryType: number, deviceId: string | undefined, size: number, page: number) {
     let url = `/api/v2/devices/${deviceId}/objects?page=${page}&size=${size}`;
-    let data = await this.request(url,token);
-    if(queryType === 0){
+    let data = await this.request(url, token);
+    if (queryType === 0) {
       return data.data;
-    }else if (queryType === 1){
+    } else if (queryType === 1) {
       return this.mapDataToFrame(data);
     } else {
       return this.mapDataToVariable(data.data);
     }
   }
 
-  async getIndicators(token: any, queryType: number, deviceId: string | undefined, objectId: string | undefined, size: number, page: number) {
+  async getIndicators(
+    token: any,
+    queryType: number,
+    deviceId: string | undefined,
+    objectId: string | undefined,
+    size: number,
+    page: number
+  ) {
     let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators?page=${page}&size=${size}`;
-    let data = await this.request(url,token);
-    if(queryType === 0){
+    let data = await this.request(url, token);
+    if (queryType === 0) {
       return data.data;
-    }else if (queryType === 1){
+    } else if (queryType === 1) {
       return this.mapDataToFrame(data);
     } else {
       return this.mapDataToVariable(data.data);
     }
   }
 
-  async getIndicatorData(token: any, deviceId: string | undefined, objectId: string | undefined, indicatorId: string | undefined, starttime: number | undefined, endtime: number | undefined) {
+  async getIndicatorData(
+    token: any,
+    deviceId: string | undefined,
+    objectId: string | undefined,
+    indicatorId: string | undefined,
+    starttime: number | undefined,
+    endtime: number | undefined
+  ) {
     let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators/${indicatorId}/data?endTime=${endtime}&startTime=${starttime}`;
-    let data = await this.request(url,token);
+    let data = await this.request(url, token);
     return this.mapIndicatorDataToFrame(data);
   }
 
@@ -103,44 +143,44 @@ export class SevOneManager {
       let values = result.data.content.map((d: any) => d[filedNames[i]]);
 
       let fieldType = FieldType.string;
-      if(typeof values[0] === "number"){
-        if(TIME_FILED_NAMES.includes(filedNames[i])){
+      if (typeof values[0] === 'number') {
+        if (TIME_FILED_NAMES.includes(filedNames[i])) {
           fieldType = FieldType.time;
-        }else{
+        } else {
           fieldType = FieldType.number;
         }
       }
-      if(typeof values[0] === "boolean"){
+      if (typeof values[0] === 'boolean') {
         fieldType = FieldType.boolean;
       }
 
-      if((values.every((value: any) => typeof value === "object")) && (!values.every((value: any) => value === null))){
+      if (values.every((value: any) => typeof value === 'object') && !values.every((value: any) => value === null)) {
         let objectFiledNames: string | string[] = [];
-        for(const value of values){
-          if(value !== null){
-            let keys = Object.keys(value)
-            for(const key of keys){
-              if(!objectFiledNames.includes(key)){
-                objectFiledNames.push(key)
+        for (const value of values) {
+          if (value !== null) {
+            let keys = Object.keys(value);
+            for (const key of keys) {
+              if (!objectFiledNames.includes(key)) {
+                objectFiledNames.push(key);
               }
             }
           }
         }
         for (let z = 0; z < objectFiledNames.length; z++) {
           let objectValues = values.map((d: any) => {
-            if(d !== null && objectFiledNames[z] in d){
+            if (d !== null && objectFiledNames[z] in d) {
               return d[objectFiledNames[z]];
-            }else{
-              return null
+            } else {
+              return null;
             }
           });
           frame.addField({
-            name: filedNames[i]+"."+objectFiledNames[z],
+            name: filedNames[i] + '.' + objectFiledNames[z],
             type: FieldType.string,
             values: objectValues,
           });
         }
-      }else{
+      } else {
         frame.addField({
           name: filedNames[i],
           type: fieldType,
@@ -161,14 +201,14 @@ export class SevOneManager {
     }
     let filedNames = Object.keys(result.data[0]);
     for (let i = 0; i < filedNames.length; i++) {
-      if(filedNames[i] !== "focus"){
+      if (filedNames[i] !== 'focus') {
         let values = result.data.map((d: any) => d[filedNames[i]]);
 
         let fieldType = FieldType.string;
-        if(typeof values[0] === "number"){
-          if(TIME_FILED_NAMES.includes(filedNames[i])){
+        if (typeof values[0] === 'number') {
+          if (TIME_FILED_NAMES.includes(filedNames[i])) {
             fieldType = FieldType.time;
-          }else{
+          } else {
             fieldType = FieldType.number;
           }
         }
@@ -190,13 +230,13 @@ export class SevOneManager {
     });
     let filedNames = Object.keys(result.data);
     for (let i = 0; i < filedNames.length; i++) {
-      if(filedNames[i] !== "pluginInfo"){
+      if (filedNames[i] !== 'pluginInfo') {
         let values = [result.data[filedNames[i]]];
         let fieldType = FieldType.string;
-        if(typeof values === "number"){
-          if(TIME_FILED_NAMES.includes(filedNames[i])){
+        if (typeof values === 'number') {
+          if (TIME_FILED_NAMES.includes(filedNames[i])) {
             fieldType = FieldType.time;
-          }else{
+          } else {
             fieldType = FieldType.number;
           }
         }
@@ -213,10 +253,9 @@ export class SevOneManager {
   }
 
   async mapDataToVariable(result: any) {
-
-    let resultsparsed = result.content.map((row: any)=>{
+    let resultsparsed = result.content.map((row: any) => {
       return { text: row.name, value: row.id };
-    })
+    });
 
     return resultsparsed;
   }
