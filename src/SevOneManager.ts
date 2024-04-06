@@ -39,18 +39,23 @@ export class SevOneManager {
   }
 
   async getAllDevices(token: any, queryType: number) {
-    let url = `/api/v2/devices?includeCount=true&page=${0}&size=${10000}`;
+    let url = `/api/v2/devices?includeCount=true&page=${0}&size=${1}`;
     let data = await this.request(url, token);
-    let loopRunsNum = data.data.totalPages - 1;
-    let results = { content: data.data.content };
+    let loopRunsNum = Math.round(data.data.totalElements / 10000);
 
-    for (let i = 1; i <= loopRunsNum; i++) {
+    let responses: any[] = [];
+    for (let i = 0; i <= loopRunsNum; i++) {
       url = `/api/v2/devices?includeCount=true&page=${i}&size=${10000}`;
-      data = await this.request(url, token);
-      results.content = results.content.concat(data.data.content);
+      responses.push(
+        this.request(url, token).then((response) => {
+          return response.data.content;
+        })
+      );
     }
-
+    responses = await Promise.all(responses);
+    let results = { content: [].concat(...responses) };
     if (queryType === 0) {
+      // This path is never called today
       return results;
     } else {
       return this.mapDataToVariable(results);
