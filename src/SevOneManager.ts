@@ -55,14 +55,18 @@ export class SevOneManager {
     responses = await Promise.all(responses);
     let results = { content: [].concat(...responses) };
     if (queryType === 0) {
-      // This path is never called today
       return results;
+    } else if (queryType === 3) {
+      return this.mapDataToSelect(results);
     } else {
       return this.mapDataToVariable(results);
     }
   }
 
-  async getDevice(token: any, deviceId: string) {
+  async getDevice(token: any, deviceId: string | null | undefined) {
+    if (deviceId === undefined || deviceId === null) {
+      return [];
+    }
     let url = `/api/v2/devices/${deviceId}`;
     let data = await this.request(url, token);
     return this.mapDeviceDataToFrame(data);
@@ -86,24 +90,34 @@ export class SevOneManager {
       return data.data;
     } else if (queryType === 1) {
       return this.mapDataToFrame(data);
+    } else if (queryType === 3) {
+      return this.mapDataToSelect(data.data);
     } else {
       return this.mapDataToVariable(data.data);
     }
   }
 
   async getObjects(token: any, queryType: number, deviceId: string | undefined, size: number, page: number) {
+    if (deviceId === undefined || deviceId === null) {
+      return [];
+    }
     let url = `/api/v2/devices/${deviceId}/objects?page=${page}&size=${size}`;
     let data = await this.request(url, token);
     if (queryType === 0) {
       return data.data;
     } else if (queryType === 1) {
       return this.mapDataToFrame(data);
+    } else if (queryType === 3) {
+      return this.mapDataToSelect(data.data);
     } else {
       return this.mapDataToVariable(data.data);
     }
   }
 
-  async getObjectID(token: any, deviceID: string, objectName: string) {
+  async getObjectID(token: any, deviceID: string | null | undefined, objectName: string) {
+    if (deviceID === undefined || deviceID === null) {
+      return '';
+    }
     let url = `/api/v2/devices/objects/filter`;
     let body = { name: objectName, deviceIds: [+deviceID] };
     let result: any = await this.postRequest(url, token, body);
@@ -122,12 +136,17 @@ export class SevOneManager {
     size: number,
     page: number
   ) {
+    if (deviceId === undefined || deviceId === null || objectId === undefined || objectId === null) {
+      return [];
+    }
     let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators?page=${page}&size=${size}`;
     let data = await this.request(url, token);
     if (queryType === 0) {
       return data.data;
     } else if (queryType === 1) {
       return this.mapDataToFrame(data);
+    } else if (queryType === 3) {
+      return this.mapDataToSelect(data.data);
     } else {
       return this.mapDataToVariable(data.data);
     }
@@ -141,6 +160,16 @@ export class SevOneManager {
     starttime: number | undefined,
     endtime: number | undefined
   ) {
+    if (
+      deviceId === undefined ||
+      deviceId === null ||
+      objectId === undefined ||
+      objectId === null ||
+      indicatorId === undefined ||
+      indicatorId === null
+    ) {
+      return [];
+    }
     let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators/${indicatorId}/data?endTime=${endtime}&startTime=${starttime}`;
     let data = await this.request(url, token);
     return this.mapIndicatorDataToFrame(data);
@@ -270,6 +299,14 @@ export class SevOneManager {
   async mapDataToVariable(result: any) {
     let resultsparsed = result.content.map((row: any) => {
       return { text: row.name, value: row.id };
+    });
+
+    return resultsparsed;
+  }
+
+  async mapDataToSelect(result: any) {
+    let resultsparsed = result.content.map((row: any) => {
+      return { label: row.name, value: row.id };
     });
 
     return resultsparsed;

@@ -8,7 +8,7 @@ import {
 
 import _ from 'lodash';
 
-import { MyQuery, MyDataSourceOptions, MyVariableQuery } from './types';
+import { MyQuery, MyDataSourceOptions, MyVariableQuery, DEFAULT_QUERY } from './types';
 
 import { getBackendSrv, getTemplateSrv } from '@grafana/runtime';
 
@@ -121,41 +121,46 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }
       let target: MyQuery = _.cloneDeep(t);
 
-      let queryType: string = target.selectedQueryCategory.value as string;
+      // console.log('==Query Logging Start==');
+      // console.log(target);
+      // console.log('==Query Logging End==');
 
-      let deviceID = '';
+      let queryType = DEFAULT_QUERY.selectedQueryCategory?.value;
+      if (target.selectedQueryCategory !== undefined && target.selectedQueryCategory !== null) {
+        queryType = target.selectedQueryCategory.value;
+      }
 
-      if (typeof target.deviceID === 'object' && target.deviceID !== null) {
-        deviceID = getTemplateSrv().replace(target.deviceID.value?.toString(), options.scopedVars, 'csv');
+      let deviceID = target.device?.value;
+
+      if (target.device !== undefined && target.device !== null && typeof target.device.value === 'string') {
+        deviceID = getTemplateSrv().replace(target.device.value, options.scopedVars, 'csv');
         if (isNaN(+deviceID)) {
           deviceID = await this.sevOneConnection.getDeviceID(token, deviceID);
         }
       }
 
-      let objectID = '';
+      let objectID = target.object?.value;
 
-      if (typeof target.objectID === 'object' && target.objectID !== null) {
-        objectID = getTemplateSrv().replace(target.objectID.value?.toString(), options.scopedVars, 'csv');
+      if (target.object !== undefined && target.object !== null && typeof target.object.value === 'string') {
+        objectID = getTemplateSrv().replace(target.object.value, options.scopedVars, 'csv');
         if (isNaN(+objectID)) {
           objectID = await this.sevOneConnection.getObjectID(token, deviceID, objectID);
         }
       }
 
-      let indicatorID = '';
+      let indicatorID = target.indicator?.value;
 
-      if (typeof target.indicatorID === 'object') {
-        if (target.indicatorID !== null) {
-          indicatorID = getTemplateSrv().replace(target.indicatorID.value?.toString(), options.scopedVars, 'csv');
-          if (isNaN(+indicatorID)) {
-            let indicatorData = this.sevOneConnection.getIndicators(token, 0, deviceID, objectID, 100, 0);
-            await indicatorData.then((response) => {
-              for (const indicator of response.content) {
-                if (indicator.name === indicatorID) {
-                  indicatorID = indicator.id;
-                }
+      if (target.indicator !== undefined && target.indicator !== null && typeof target.indicator.value === 'string') {
+        indicatorID = getTemplateSrv().replace(target.indicator.value.toString(), options.scopedVars, 'csv');
+        if (isNaN(+indicatorID)) {
+          let indicatorData = this.sevOneConnection.getIndicators(token, 0, deviceID, objectID, 100, 0);
+          await indicatorData.then((response) => {
+            for (const indicator of response.content) {
+              if (indicator.name === indicatorID) {
+                indicatorID = indicator.id;
               }
-            });
-          }
+            }
+          });
         }
       }
 
@@ -173,12 +178,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
       switch (queryType) {
         case 'Devices':
-          if (typeof target.deviceID === 'object') {
-            if (target.deviceID !== null) {
-              return this.sevOneConnection.getDevice(token, deviceID);
-            } else {
-              return this.sevOneConnection.getDevices(token, 1, size, page);
-            }
+          if (deviceID !== undefined && deviceID !== null) {
+            return this.sevOneConnection.getDevice(token, deviceID);
           } else {
             return this.sevOneConnection.getDevices(token, 1, size, page);
           }

@@ -1,25 +1,30 @@
-import { DataQuery, DataSourceJsonData, SelectableValue  } from '@grafana/data';
+import { DataSourceJsonData, SelectableValue } from '@grafana/data';
+import { DataQuery } from '@grafana/schema';
 
 export interface MyQuery extends DataQuery {
   selectedQueryCategory: SelectableValue<string>;
-  deviceID: SelectableValue<number> | null;
-  objectID: SelectableValue<number> | null;
-  indicatorID: SelectableValue<number> | null;
+  deviceID: SelectableValue<number> | null; //DEPRECATED
+  objectID: SelectableValue<number> | null; //DEPRECATED
+  indicatorID: SelectableValue<number> | null; //DEPRECATED
   page: number;
   size: number;
+
+  device: SelectableValue<string> | null;
+  object: SelectableValue<string> | null;
+  indicator: SelectableValue<string> | null;
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
   selectedQueryCategory: {
-    label: 'Application Overview',
-    value: 'Application_Overview',
-    description: 'Grab Application Overview',
+    label: 'Devices',
+    value: 'Devices',
+    description: 'Grab All Devices Info from SevOne',
   },
-  deviceID: {},
-  objectID: {},
-  indicatorID: {},
   page: 0,
   size: 20,
+  device: null,
+  object: null,
+  indicator: null,
 };
 
 /**
