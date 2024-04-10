@@ -2,12 +2,12 @@
 
 This SevOne Grafana Datasource Plugin enables communication between Grafana and SevOne to pull Device data, Object data, Indicator data, and Indicator metrics your instance.
 
-![GitHub package.json version](https://img.shields.io/github/package-json/v/optimizca/grafana_sevone)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/optimizca/grafana_sevone?label=GitHub%20Version)
 [![Build](https://github.com/optimizca/grafana_sevone/actions/workflows/ci.yml/badge.svg)](https://github.com/optimizca/grafana_sevone/actions/workflows/ci.yml)
-![Grafana Signature Level](https://img.shields.io/badge/Signature_Level-Community-limegreen?logo=grafana)
-![Grafana Minimum Version](https://img.shields.io/badge/Minimum_Version-v10.0.3-red?logo=grafana)
 ![GitHub last commit](https://img.shields.io/github/last-commit/optimizca/grafana_sevone)
-![GitHub all releases](https://img.shields.io/github/downloads/optimizca/grafana_sevone/total)
+![Grafana Signature Level](https://img.shields.io/badge/Signature_Level-Community-limegreen?logo=grafana)
+[![Grafana Catalog Version](https://img.shields.io/badge/dynamic/json?logo=grafana&color=F47A20&label=catalog&prefix=v&query=%24.items%5B%3F%28%40.slug%20%3D%3D%20%22optimiz-sevone-datasource%22%29%5D.version&url=https%3A%2F%2Fgrafana.com%2Fapi%2Fplugins)](https://grafana.com/grafana/plugins/optimiz-sevone-datasource/)
+[![Grafana Downloads](https://img.shields.io/badge/dynamic/json?logo=grafana&color=F47A20&label=downloads&query=%24.items%5B%3F%28%40.slug%20%3D%3D%20%22optimiz-sevone-datasource%22%29%5D.downloads&url=https%3A%2F%2Fgrafana.com%2Fapi%2Fplugins)](https://grafana.com/grafana/plugins/optimiz-sevone-datasource/)
 
 ## Table of Content
 
@@ -37,33 +37,33 @@ This SevOne Grafana Datasource Plugin enables communication between Grafana and 
 
 ### Devices
 
-| Option Name | Description | Options | Additional Info |
-| ----------- | ----------- | ------- | --------------- |
-| Devices | Selecting a Device will only return the data of the specified Device. If no Device is selected then the query will return all Device data. | Device Name or ID | Not Required for this Query Category |
-| Size | Limits the amount of records returned to the number submitted | 1-10000 | Default is 20 |
-| Page | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999 | Default is 0, which is the first page |
+| Option Name | Description                                                                                                                                                                                                                     | Options           | Additional Info                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------- |
+| Devices     | Selecting a Device will only return the data of the specified Device. If no Device is selected then the query will return all Device data.                                                                                      | Device Name or ID | Not Required for this Query Category  |
+| Size        | Limits the amount of records returned to the number submitted                                                                                                                                                                   | 1-10000           | Default is 20                         |
+| Page        | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999            | Default is 0, which is the first page |
 
 ### Object
 
-| Option Name | Description | Options | Additional Info |
-| ----------- | ----------- | ------- | --------------- |
-| Devices | Selecting a Device will return all the Objects connected to the specified Device | Device Name or ID | Required for this Query Category |
-| Size | Limits the amount of records returned to the number submitted | 1-10000 | Default is 20 |
-| Page | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999 | Default is 0, which is the first page |
+| Option Name | Description                                                                                                                                                                                                                     | Options           | Additional Info                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------- |
+| Devices     | Selecting a Device will return all the Objects connected to the specified Device                                                                                                                                                | Device Name or ID | Required for this Query Category      |
+| Size        | Limits the amount of records returned to the number submitted                                                                                                                                                                   | 1-10000           | Default is 20                         |
+| Page        | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999            | Default is 0, which is the first page |
 
 ### Indicators
 
-| Option Name | Description | Options | Additional Info |
-| ----------- | ----------- | ------- | --------------- |
-| Devices | Selecting a Device will fill in the Object field with Objects connected to the specificed Device | Device Name or ID | Required for this Query Category |
-| Object | Selecting a Object will return all the Indicators data connected to the specified Device and the specified Object | Object Name or ID | Required for this Query Category |
-| Size | Limits the amount of records returned to the number submitted | 1-10000 | Default is 20 |
-| Page | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999 | Default is 0, which is the first page |
+| Option Name | Description                                                                                                                                                                                                                     | Options           | Additional Info                       |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------------------------------------- |
+| Devices     | Selecting a Device will fill in the Object field with Objects connected to the specificed Device                                                                                                                                | Device Name or ID | Required for this Query Category      |
+| Object      | Selecting a Object will return all the Indicators data connected to the specified Device and the specified Object                                                                                                               | Object Name or ID | Required for this Query Category      |
+| Size        | Limits the amount of records returned to the number submitted                                                                                                                                                                   | 1-10000           | Default is 20                         |
+| Page        | This option, in combination with the Size input, can be thought of as pagination for your requests. Ex. Setting a Size of 10 returns the first 10 records and to see the 10 records following those, increase your page number. | 0-9999            | Default is 0, which is the first page |
 
 ### Indicators Metrics
 
-| Option Name | Description | Options | Additional Info |
-| ----------- | ----------- | ------- | --------------- |
-| Devices | Selecting a Device will fill in the Object field with Objects connected to the specificed Device | Device Name or ID | Required for this Query Category |
-| Object | Selecting a Object will fill in the Indicator field with Indicator connected to the specificed Device and the specificed Object| Object Name or ID | Required for this Query Category |
-| Indicator | Selecting a Indicator will return the Indicators metrics connected to the specified Device, the specified Object, and the specified Indicator | Indicator Name or ID | Required for this Query Category |
+| Option Name | Description                                                                                                                                   | Options              | Additional Info                  |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | -------------------------------- |
+| Devices     | Selecting a Device will fill in the Object field with Objects connected to the specificed Device                                              | Device Name or ID    | Required for this Query Category |
+| Object      | Selecting a Object will fill in the Indicator field with Indicator connected to the specificed Device and the specificed Object               | Object Name or ID    | Required for this Query Category |
+| Indicator   | Selecting a Indicator will return the Indicators metrics connected to the specified Device, the specified Object, and the specified Indicator | Indicator Name or ID | Required for this Query Category |
