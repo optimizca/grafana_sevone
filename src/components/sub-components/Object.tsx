@@ -8,7 +8,7 @@ interface SubComponentProps {
   updateQuery: (key: string, value: any) => void;
   setObject: any;
   datasource: DataSource;
-  device: SelectableValue<string> | null;
+  device: Array<SelectableValue<string>>;
 }
 
 const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, datasource, device }) => {
@@ -23,7 +23,7 @@ const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, d
       try {
         let token = '';
         token = await datasource.getToken();
-        results = await datasource.sevOneConnection.getObjects(token, 3, device?.value, 20, 0);
+        results = await datasource.sevOneConnection.getObjects(token, 3, device, 20, 0);
       } catch (err) {
         console.error('Error Loading Devices: ', err);
         results = [{ label: 'Error Loading Devices', value: '' }];

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { MutableDataFrame, FieldType } from '@grafana/data';
+import { MutableDataFrame, FieldType, SelectableValue } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
 
 import { TIME_FILED_NAMES } from './Constants';
@@ -63,13 +63,25 @@ export class SevOneManager {
     }
   }
 
-  async getDevice(token: any, deviceId: string | null | undefined) {
-    if (deviceId === undefined || deviceId === null) {
+  async getDevice(token: any, device: Array<SelectableValue<string>>) {
+    if (device.length === 0) {
       return [];
     }
-    let url = `/api/v2/devices/${deviceId}`;
-    let data = await this.request(url, token);
-    return this.mapDeviceDataToFrame(data);
+    // let url = `/api/v2/devices/${device[0].value}`;
+    // let data = await this.request(url, token);
+    let responses: any[] = [];
+    device.forEach((singleDevice) => {
+      let url = `/api/v2/devices/${singleDevice.value}`;
+      responses.push(
+        this.request(url, token).then((response) => {
+          return response.data;
+        })
+      );
+    });
+    responses = await Promise.all(responses);
+    let results = [].concat(...responses);
+
+    return this.mapDeviceDataToFrame(results);
   }
 
   async getDeviceID(token: any, deviceName: string) {
@@ -97,35 +109,47 @@ export class SevOneManager {
     }
   }
 
-  async getObjects(token: any, queryType: number, deviceId: string | undefined, size: number, page: number) {
-    if (deviceId === undefined || deviceId === null) {
+  async getObjects(token: any, queryType: number, device: Array<SelectableValue<string>>, size: number, page: number) {
+    if (device.length === 0) {
       return [];
     }
-    let url = `/api/v2/devices/${deviceId}/objects?page=${page}&size=${size}`;
-    let data = await this.request(url, token);
+    let responses: any[] = [];
+    device.forEach((singleDevice) => {
+      let url = `/api/v2/devices/${singleDevice.value}/objects?page=${page}&size=${size}`;
+      responses.push(
+        this.request(url, token).then((response) => {
+          return response.data.content;
+        })
+      );
+    });
+    responses = await Promise.all(responses);
+    let results = [].concat(...responses);
     if (queryType === 0) {
-      return data.data;
+      return results;
     } else if (queryType === 1) {
-      return this.mapDataToFrame(data.data.content);
+      return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(data.data.content);
+      return this.mapDataToSelect(results);
     } else {
-      return this.mapDataToVariable(data.data);
+      return this.mapDataToVariable(results);
     }
   }
 
-  async getObjectID(token: any, deviceID: string | null | undefined, objectName: string) {
-    if (deviceID === undefined || deviceID === null) {
-      return '';
+  async getObjectID(token: any, device: Array<SelectableValue<string>>, objectName: string) {
+    if (device.length === 0) {
+      return [];
     }
+    let deviceIDs = device.map((singleDevice) => singleDevice.value);
     let url = `/api/v2/devices/objects/filter`;
-    let body = { name: objectName, deviceIds: [+deviceID] };
+    let body = { name: objectName, deviceIds: deviceIDs };
     let result: any = await this.postRequest(url, token, body);
-    let objectID = '0';
-    if (result.data.content && result.data.content.length > 0) {
-      objectID = result.data.content[0].id;
-    }
-    return objectID;
+    console.log(result.data.content);
+    let objectIDs = result.data.content.map((singleObject: any) => singleObject.id);
+    // let objectID = '0';
+    // if (result.data.content && result.data.content.length > 0) {
+    //   objectID = result.data.content[0].id;
+    // }
+    return objectIDs;
   }
 
   async getIndicators(
@@ -324,10 +348,11 @@ export class SevOneManager {
     const frame = new MutableDataFrame({
       fields: [],
     });
-    let filedNames = Object.keys(result.data);
+    let filedNames = Object.keys(result[0]);
     for (let i = 0; i < filedNames.length; i++) {
       if (filedNames[i] !== 'pluginInfo') {
-        let values = [result.data[filedNames[i]]];
+        // let values = [result[filedNames[i]]];
+        let values = result.map((d: any) => d[filedNames[i]]);
         let fieldType = FieldType.string;
         if (typeof values === 'number') {
           if (TIME_FILED_NAMES.includes(filedNames[i])) {

@@ -4,6 +4,7 @@ import {
   DataSourceApi,
   DataSourceInstanceSettings,
   LoadingState,
+  SelectableValue,
 } from '@grafana/data';
 
 import _ from 'lodash';
@@ -121,9 +122,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }
       let target: MyQuery = _.cloneDeep(t);
 
-      console.log('==Query Logging Start==');
-      console.log(target);
-      console.log('==Query Logging End==');
+      // console.log('==Target Logging Start==');
+      // console.log(target);
+      // console.log('==Target Logging End==');
 
       let queryType = DEFAULT_QUERY.selectedQueryCategory?.value;
       if (target.selectedQueryCategory !== undefined && target.selectedQueryCategory !== null) {
@@ -144,23 +145,26 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         // }
       }
 
-      let deviceID = target.device?.value;
-
-      if (target.device !== undefined && target.device !== null && typeof target.device.value === 'string') {
-        deviceID = getTemplateSrv().replace(target.device.value, options.scopedVars, 'csv');
-        if (isNaN(+deviceID)) {
-          deviceID = await this.sevOneConnection.getDeviceID(token, deviceID);
+      let device: Array<SelectableValue<string>> = [];
+      target.device.forEach((singleDevice) => {
+        let updatedSingleDevice = { ...singleDevice };
+        if (typeof singleDevice.value === 'string') {
+          updatedSingleDevice.value = getTemplateSrv().replace(singleDevice.value, options.scopedVars, 'csv');
         }
-      }
+        device.push(updatedSingleDevice);
+      });
 
       let objectID = target.object?.value;
+      let object: any[] = [];
 
       if (target.object !== undefined && target.object !== null && typeof target.object.value === 'string') {
         objectID = getTemplateSrv().replace(target.object.value, options.scopedVars, 'csv');
         if (isNaN(+objectID)) {
-          objectID = await this.sevOneConnection.getObjectID(token, deviceID, objectID);
+          let oIDs = await this.sevOneConnection.getObjectID(token, device, objectID);
+          object = object.concat(oIDs);
         }
       }
+      console.log('object: ', object);
 
       let indicatorID = target.indicator?.value;
 
@@ -192,15 +196,15 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
       switch (queryType) {
         case 'Devices':
-          if (deviceGroupID !== undefined && deviceGroupID !== null && (deviceID === undefined || deviceID === null)) {
+          if (deviceGroupID !== undefined && deviceGroupID !== null && device.length === 0) {
             return this.sevOneConnection.getDeviceGroupMembers(token, 1, deviceGroupID);
-          } else if (deviceID !== undefined && deviceID !== null) {
-            return this.sevOneConnection.getDevice(token, deviceID);
+          } else if (device.length > 0) {
+            return this.sevOneConnection.getDevice(token, device);
           } else {
             return this.sevOneConnection.getDevices(token, 1, size, page);
           }
         case 'Objects':
-          return this.sevOneConnection.getObjects(token, 1, deviceID, size, page);
+          return this.sevOneConnection.getObjects(token, 1, device, size, page);
         case 'Indicators':
           return this.sevOneConnection.getIndicators(token, 1, deviceID, objectID, size, page);
         case 'IndicatorData':

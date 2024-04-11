@@ -4,7 +4,7 @@ import { Select, InlineField, InlineFieldRow } from '@grafana/ui';
 import { DataSource } from '../../datasource';
 
 interface SubComponentProps {
-  device: SelectableValue<string> | null;
+  device: Array<SelectableValue<string>>;
   updateQuery: (key: string, value: any) => void;
   setDevice: any;
   datasource: DataSource;
@@ -82,21 +82,21 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
             value={device}
             isSearchable={true}
             isClearable={true}
-            isMulti={false}
+            isMulti={true}
             backspaceRemovesValue={true}
             allowCustomValue={true}
             allowCreateWhileLoading={true}
             menuPlacement="auto"
             onCreateOption={(v) => {
-              updateQuery('device', { label: v, value: v });
-              setDevice({ label: v, value: v });
-              // let newValue: any[] = [];
-              // if (device.length > 0) {
-              //   newValue = [...device];
-              // }
-              // newValue.push({ label: v, value: v });
-              // updateQuery('device', newValue);
-              // setDevice(newValue);
+              // updateQuery('device', { label: v, value: v });
+              // setDevice({ label: v, value: v });
+              let newValue: Array<SelectableValue<string>> = [];
+              if (device.length > 0) {
+                newValue = [...device];
+              }
+              newValue.push({ label: v, value: v });
+              updateQuery('device', newValue);
+              setDevice(newValue);
             }}
             onChange={(v) => {
               updateQuery('device', v);

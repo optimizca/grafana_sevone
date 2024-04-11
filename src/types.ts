@@ -9,7 +9,8 @@ export interface MyQuery extends DataQuery {
   page: number;
   size: number;
 
-  device: SelectableValue<string> | null;
+  device: Array<SelectableValue<string>>;
+  // TODO Turn Object and Indicator into multi-value select and Array types
   object: SelectableValue<string> | null;
   indicator: SelectableValue<string> | null;
   deviceGroup: SelectableValue<string> | null;
@@ -23,7 +24,7 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
   },
   page: 0,
   size: 20,
-  device: null,
+  device: [],
   object: null,
   indicator: null,
   deviceGroup: null,

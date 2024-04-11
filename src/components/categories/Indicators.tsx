@@ -18,7 +18,7 @@ interface SubComponentProps {
 const Indicators: React.FC<SubComponentProps> = ({ query, updateQuery, datasource }) => {
   // console.log('Render Objects Category');
 
-  const [device, setDevice] = React.useState<SelectableValue<string> | null>(query.device);
+  const [device, setDevice] = React.useState<Array<SelectableValue<string>>>(query.device);
   const [deviceGroup, setDeviceGroup] = React.useState<SelectableValue<string> | null>(query.deviceGroup);
   const [object, setObject] = React.useState<SelectableValue<string> | null>(query.object);
   const [size, setSize] = React.useState<number>(query.size);
