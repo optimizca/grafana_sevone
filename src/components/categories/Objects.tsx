@@ -6,6 +6,7 @@ import { MyQuery } from '../../types';
 import Device from 'components/sub-components/Device';
 import Page from 'components/sub-components/Page';
 import Size from 'components/sub-components/Size';
+import DeviceGroup from 'components/sub-components/DeviceGroup';
 
 interface SubComponentProps {
   query: MyQuery;
@@ -17,12 +18,25 @@ const Objects: React.FC<SubComponentProps> = ({ query, updateQuery, datasource }
   // console.log('Render Objects Category');
 
   const [device, setDevice] = React.useState<SelectableValue<string> | null>(query.device);
+  const [deviceGroup, setDeviceGroup] = React.useState<SelectableValue<string> | null>(query.deviceGroup);
   const [size, setSize] = React.useState<number>(query.size);
   const [page, setPage] = React.useState<number>(query.page);
 
   return (
     <>
-      <Device device={device} updateQuery={updateQuery} setDevice={setDevice} datasource={datasource} />
+      <DeviceGroup
+        deviceGroup={deviceGroup}
+        updateQuery={updateQuery}
+        setDeviceGroup={setDeviceGroup}
+        datasource={datasource}
+      />
+      <Device
+        device={device}
+        updateQuery={updateQuery}
+        setDevice={setDevice}
+        datasource={datasource}
+        deviceGroup={deviceGroup}
+      />
       <Size size={size} updateQuery={updateQuery} setSize={setSize} />
       <Page page={page} updateQuery={updateQuery} setPage={setPage} />
     </>

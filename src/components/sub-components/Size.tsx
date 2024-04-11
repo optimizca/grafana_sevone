@@ -13,7 +13,7 @@ const Size: React.FC<SubComponentProps> = ({ size, updateQuery, setSize }) => {
   return (
     <div>
       <InlineFieldRow>
-        <InlineField label="Size" labelWidth={15}>
+        <InlineField label="Size" labelWidth={20}>
           <Input
             type="number"
             width={20}

@@ -57,7 +57,7 @@ export class SevOneManager {
     if (queryType === 0) {
       return results;
     } else if (queryType === 3) {
-      return this.mapDataToSelect(results);
+      return this.mapDataToSelect(results.content);
     } else {
       return this.mapDataToVariable(results);
     }
@@ -89,9 +89,9 @@ export class SevOneManager {
     if (queryType === 0) {
       return data.data;
     } else if (queryType === 1) {
-      return this.mapDataToFrame(data);
+      return this.mapDataToFrame(data.data.content);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(data.data);
+      return this.mapDataToSelect(data.data.content);
     } else {
       return this.mapDataToVariable(data.data);
     }
@@ -106,9 +106,9 @@ export class SevOneManager {
     if (queryType === 0) {
       return data.data;
     } else if (queryType === 1) {
-      return this.mapDataToFrame(data);
+      return this.mapDataToFrame(data.data.content);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(data.data);
+      return this.mapDataToSelect(data.data.content);
     } else {
       return this.mapDataToVariable(data.data);
     }
@@ -144,9 +144,9 @@ export class SevOneManager {
     if (queryType === 0) {
       return data.data;
     } else if (queryType === 1) {
-      return this.mapDataToFrame(data);
+      return this.mapDataToFrame(data.data.content);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(data.data);
+      return this.mapDataToSelect(data.data.content);
     } else {
       return this.mapDataToVariable(data.data);
     }
@@ -175,16 +175,68 @@ export class SevOneManager {
     return this.mapIndicatorDataToFrame(data);
   }
 
+  async getDeviceGroups(token: any, queryType: number, size: number, page: number) {
+    let url = `/api/v2/devicegroups?includeMembers=false&page=${page}&size=${size}`;
+    let response = await this.request(url, token);
+    if (queryType === 1) {
+      return this.mapDataToFrame(response.data.content);
+    } else if (queryType === 3) {
+      return this.mapDataToSelect(response.data.content);
+    } else {
+      return this.mapDataToVariable(response.data);
+    }
+  }
+
+  async getAllDeviceGroups(token: any, queryType: number) {
+    let url = `/api/v2/devicegroups?includeMembers=false&includeCount=true&page=0&size=1`;
+    let counterResponse = await this.request(url, token);
+    let loopRunsNum = Math.round(counterResponse.data.totalElements / 10000);
+
+    let responses: any[] = [];
+    for (let i = 0; i <= loopRunsNum; i++) {
+      url = `/api/v2/devicegroups?includeMembers=false&page=${i}&size=${10000}`;
+      responses.push(
+        this.request(url, token).then((response) => {
+          return response.data.content;
+        })
+      );
+    }
+    responses = await Promise.all(responses);
+    let results = { content: [].concat(...responses) };
+    if (queryType === 1) {
+      return this.mapDataToFrame(results.content);
+    } else if (queryType === 3) {
+      return this.mapDataToSelect(results.content);
+    } else {
+      return this.mapDataToVariable(results);
+    }
+  }
+
+  async getDeviceGroupMembers(token: any, queryType: number, deviceGroupID: string | undefined) {
+    if (deviceGroupID === undefined || deviceGroupID === null) {
+      return [];
+    }
+    let url = `/api/v2/devicegroups/${deviceGroupID}?includeMembers=true`;
+    let response = await this.request(url, token);
+    if (queryType === 1) {
+      return this.mapDataToFrame(response.data.devices);
+    } else if (queryType === 3) {
+      return this.mapDataToSelect(response.data.devices);
+    } else {
+      return this.mapDataToVariable(response.data.devices);
+    }
+  }
+
   async mapDataToFrame(result: any) {
     const frame = new MutableDataFrame({
       fields: [],
     });
-    if (!(result.data.content.length > 0)) {
+    if (result === undefined || result === null || !(result.length > 0)) {
       return [];
     }
-    let filedNames = Object.keys(result.data.content[0]);
+    let filedNames = Object.keys(result[0]);
     for (let i = 0; i < filedNames.length; i++) {
-      let values = result.data.content.map((d: any) => d[filedNames[i]]);
+      let values = result.map((d: any) => d[filedNames[i]]);
 
       let fieldType = FieldType.string;
       if (typeof values[0] === 'number') {
@@ -305,7 +357,10 @@ export class SevOneManager {
   }
 
   async mapDataToSelect(result: any) {
-    let resultsparsed = result.content.map((row: any) => {
+    if (result === undefined || result === null) {
+      return [];
+    }
+    let resultsparsed = result.map((row: any) => {
       return { label: row.name, value: row.id };
     });
 

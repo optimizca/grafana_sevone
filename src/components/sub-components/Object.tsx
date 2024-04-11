@@ -41,7 +41,7 @@ const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, d
   return (
     <div>
       <InlineFieldRow>
-        <InlineField label="Object" labelWidth={15}>
+        <InlineField label="Object" labelWidth={20}>
           <Select
             width={30}
             options={objectOptions}

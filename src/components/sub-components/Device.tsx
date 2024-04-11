@@ -8,9 +8,10 @@ interface SubComponentProps {
   updateQuery: (key: string, value: any) => void;
   setDevice: any;
   datasource: DataSource;
+  deviceGroup: SelectableValue<string> | null;
 }
 
-const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, datasource }) => {
+const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, datasource, deviceGroup }) => {
   const [deviceOptions, setDeviceOptions] = React.useState([{ label: 'Loading ...', value: '' }]);
   const [originalDeviceOptions, setOriginalDeviceOptions] = React.useState([{ label: 'Loading ...', value: '' }]);
   const [allDeviceOptions, setAllDeviceOptions] = React.useState([{ label: 'Loading ...', value: '' }]);
@@ -25,8 +26,14 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
       try {
         let token = '';
         token = await datasource.getToken();
-        results = await datasource.sevOneConnection.getDevices(token, 3, 20, 0);
-        allResults = await datasource.sevOneConnection.getAllDevices(token, 3);
+        if (deviceGroup === undefined || deviceGroup === null) {
+          results = await datasource.sevOneConnection.getDevices(token, 3, 20, 0);
+          allResults = await datasource.sevOneConnection.getAllDevices(token, 3);
+        } else {
+          allResults = await datasource.sevOneConnection.getDeviceGroupMembers(token, 3, deviceGroup.value);
+          results = allResults.slice(0, 20);
+        }
+        console.log('allResults: ', allResults);
       } catch (err) {
         console.error('Error Loading Devices: ', err);
         results = [{ label: 'Error Loading Devices', value: '' }];
@@ -41,7 +48,7 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
     return () => {
       unmounted = true;
     };
-  }, [datasource]);
+  }, [datasource, deviceGroup]);
 
   const filterOptions = (value: string) => {
     // const timerStart = Date.now();
@@ -67,7 +74,7 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
   return (
     <div>
       <InlineFieldRow>
-        <InlineField label="Device" labelWidth={15}>
+        <InlineField label="Device" labelWidth={20}>
           <Select
             width={30}
             options={deviceOptions}
@@ -83,6 +90,13 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
             onCreateOption={(v) => {
               updateQuery('device', { label: v, value: v });
               setDevice({ label: v, value: v });
+              // let newValue: any[] = [];
+              // if (device.length > 0) {
+              //   newValue = [...device];
+              // }
+              // newValue.push({ label: v, value: v });
+              // updateQuery('device', newValue);
+              // setDevice(newValue);
             }}
             onChange={(v) => {
               updateQuery('device', v);

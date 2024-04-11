@@ -6,6 +6,7 @@ import { MyQuery } from '../../types';
 import Device from 'components/sub-components/Device';
 import Object from 'components/sub-components/Object';
 import Indicator from 'components/sub-components/Indicator';
+import DeviceGroup from 'components/sub-components/DeviceGroup';
 
 interface SubComponentProps {
   query: MyQuery;
@@ -17,12 +18,25 @@ const IndicatorMetrics: React.FC<SubComponentProps> = ({ query, updateQuery, dat
   // console.log('Render Objects Category');
 
   const [device, setDevice] = React.useState<SelectableValue<string> | null>(query.device);
+  const [deviceGroup, setDeviceGroup] = React.useState<SelectableValue<string> | null>(query.deviceGroup);
   const [object, setObject] = React.useState<SelectableValue<string> | null>(query.object);
   const [indicator, setIndicator] = React.useState<SelectableValue<string> | null>(query.indicator);
 
   return (
     <>
-      <Device device={device} updateQuery={updateQuery} setDevice={setDevice} datasource={datasource} />
+      <DeviceGroup
+        deviceGroup={deviceGroup}
+        updateQuery={updateQuery}
+        setDeviceGroup={setDeviceGroup}
+        datasource={datasource}
+      />
+      <Device
+        device={device}
+        updateQuery={updateQuery}
+        setDevice={setDevice}
+        datasource={datasource}
+        deviceGroup={deviceGroup}
+      />
       <Object object={object} updateQuery={updateQuery} setObject={setObject} datasource={datasource} device={device} />
       <Indicator
         indicator={indicator}

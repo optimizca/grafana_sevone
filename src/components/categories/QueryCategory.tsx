@@ -40,7 +40,7 @@ const QueryCategory: React.FC<SubComponentProps> = ({ query, updateQuery, dataso
   return (
     <div>
       <InlineFieldRow>
-        <InlineField label="Query Type" labelWidth={15}>
+        <InlineField label="Query Type" labelWidth={20}>
           <Select
             width={30}
             options={queryOptions}

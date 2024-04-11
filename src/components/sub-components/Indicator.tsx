@@ -49,7 +49,7 @@ const Indicator: React.FC<SubComponentProps> = ({
   return (
     <div>
       <InlineFieldRow>
-        <InlineField label="Indicator" labelWidth={15}>
+        <InlineField label="Indicator" labelWidth={20}>
           <Select
             width={30}
             options={indicatorOptions}

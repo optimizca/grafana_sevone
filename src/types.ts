@@ -12,6 +12,7 @@ export interface MyQuery extends DataQuery {
   device: SelectableValue<string> | null;
   object: SelectableValue<string> | null;
   indicator: SelectableValue<string> | null;
+  deviceGroup: SelectableValue<string> | null;
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
@@ -25,6 +26,7 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
   device: null,
   object: null,
   indicator: null,
+  deviceGroup: null,
 };
 
 /**

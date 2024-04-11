@@ -121,13 +121,27 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       }
       let target: MyQuery = _.cloneDeep(t);
 
-      // console.log('==Query Logging Start==');
-      // console.log(target);
-      // console.log('==Query Logging End==');
+      console.log('==Query Logging Start==');
+      console.log(target);
+      console.log('==Query Logging End==');
 
       let queryType = DEFAULT_QUERY.selectedQueryCategory?.value;
       if (target.selectedQueryCategory !== undefined && target.selectedQueryCategory !== null) {
         queryType = target.selectedQueryCategory.value;
+      }
+
+      let deviceGroupID = target.deviceGroup?.value;
+
+      if (
+        target.deviceGroup !== undefined &&
+        target.deviceGroup !== null &&
+        typeof target.deviceGroup.value === 'string'
+      ) {
+        deviceGroupID = getTemplateSrv().replace(target.deviceGroup.value, options.scopedVars, 'csv');
+        // TODO See if filter function is available for device groups to convert name into ID
+        // if (isNaN(+deviceGroupID)) {
+        //   deviceGroupID = await this.sevOneConnection.getDeviceID(token, deviceGroupID);
+        // }
       }
 
       let deviceID = target.device?.value;
@@ -178,7 +192,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
       switch (queryType) {
         case 'Devices':
-          if (deviceID !== undefined && deviceID !== null) {
+          if (deviceGroupID !== undefined && deviceGroupID !== null && (deviceID === undefined || deviceID === null)) {
+            return this.sevOneConnection.getDeviceGroupMembers(token, 1, deviceGroupID);
+          } else if (deviceID !== undefined && deviceID !== null) {
             return this.sevOneConnection.getDevice(token, deviceID);
           } else {
             return this.sevOneConnection.getDevices(token, 1, size, page);

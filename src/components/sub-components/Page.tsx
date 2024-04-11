@@ -13,7 +13,7 @@ const Page: React.FC<SubComponentProps> = ({ page, updateQuery, setPage }) => {
   return (
     <div>
       <InlineFieldRow>
-        <InlineField label="Page" labelWidth={15}>
+        <InlineField label="Page" labelWidth={20}>
           <Input
             type="number"
             width={20}

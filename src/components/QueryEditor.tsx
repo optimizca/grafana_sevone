@@ -15,6 +15,7 @@ type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
 export function QueryEditor({ query, onChange, datasource }: Props) {
   const updateQuery = (key: string, value: any) => {
+    console.log(`updateQuery key:${key} - value:`, value);
     onChange({ ...query, [key]: value });
   };
 
