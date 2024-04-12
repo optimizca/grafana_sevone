@@ -140,7 +140,7 @@ export class SevOneManager {
       return [];
     }
     let deviceIDs = device.map((singleDevice) => singleDevice.value);
-    let url = `/api/v2/devices/objects/filter`;
+    let url = `/api/v2/devices/objects/filter?includeExtendedInfo=false`;
     let body = { name: objectName, deviceIds: deviceIDs };
     let result: any = await this.postRequest(url, token, body);
     console.log(result.data.content);
