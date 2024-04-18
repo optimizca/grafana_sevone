@@ -71,7 +71,7 @@ const DeviceGroup: React.FC<SubComponentProps> = ({ deviceGroup, updateQuery, se
       <InlineFieldRow>
         <InlineField label="Device Group (Optional)" labelWidth={20}>
           <Select
-            width={30}
+            width={80}
             options={deviceGroupOptions}
             defaultValue={deviceGroup}
             value={deviceGroup}

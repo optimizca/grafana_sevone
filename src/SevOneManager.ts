@@ -53,17 +53,17 @@ export class SevOneManager {
       );
     }
     responses = await Promise.all(responses);
-    let results = { content: [].concat(...responses) };
+    let results: any = [].concat(...responses);
     if (queryType === 0) {
       return results;
     } else if (queryType === 3) {
-      return this.mapDataToSelect(results.content);
+      return this.mapDataToSelect(results);
     } else {
       return this.mapDataToVariable(results);
     }
   }
 
-  async getDevice(token: any, device: Array<SelectableValue<string>>) {
+  async getDevice(token: any, device: Array<SelectableValue<string>>, queryType: number) {
     if (device.length === 0) {
       return [];
     }
@@ -79,9 +79,14 @@ export class SevOneManager {
       );
     });
     responses = await Promise.all(responses);
-    let results = [].concat(...responses);
-
-    return this.mapDeviceDataToFrame(results);
+    let results: any[] = [].concat(...responses);
+    if (queryType === 0) {
+      return results;
+    } else if (queryType === 1) {
+      return this.mapDeviceDataToFrame(results);
+    } else {
+      return results;
+    }
   }
 
   async getDeviceID(token: any, deviceName: string) {
@@ -105,7 +110,46 @@ export class SevOneManager {
     } else if (queryType === 3) {
       return this.mapDataToSelect(data.data.content);
     } else {
-      return this.mapDataToVariable(data.data);
+      return this.mapDataToVariable(data.data.content);
+    }
+  }
+
+  async getObject(
+    token: any,
+    queryType: number,
+    device: Array<SelectableValue<string>>,
+    object: Array<SelectableValue<string>>
+  ) {
+    if (device.length === 0 || object.length === 0) {
+      return [];
+    }
+    let responses: any[] = [];
+    object.forEach((singleObject) => {
+      let deviceLabel = singleObject.label?.substring(0, singleObject.label?.indexOf('--'));
+      let matchingDevice: Array<SelectableValue<string>> = device.filter(
+        (singleDevice) => singleDevice.label === deviceLabel
+      );
+      if (matchingDevice.length === 0) {
+        return;
+      }
+      let url = `/api/v2/devices/${matchingDevice[0].value}/objects/${singleObject.value}`;
+      responses.push(
+        this.request(url, token)
+          .then((response) => {
+            return response.data;
+          })
+          .catch((e) => {
+            console.log(e);
+            return [];
+          })
+      );
+    });
+    responses = await Promise.all(responses);
+    let results: any = [].concat(...responses);
+    if (queryType === 0) {
+      return results;
+    } else {
+      return this.mapDataToVariable(results);
     }
   }
 
@@ -123,13 +167,13 @@ export class SevOneManager {
       );
     });
     responses = await Promise.all(responses);
-    let results = [].concat(...responses);
+    let results: any = [].concat(...responses);
     if (queryType === 0) {
       return results;
     } else if (queryType === 1) {
       return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(results);
+      return this.mapObjectDataToSelect(results, token);
     } else {
       return this.mapDataToVariable(results);
     }
@@ -143,7 +187,6 @@ export class SevOneManager {
     let url = `/api/v2/devices/objects/filter?includeExtendedInfo=false`;
     let body = { name: objectName, deviceIds: deviceIDs };
     let result: any = await this.postRequest(url, token, body);
-    console.log(result.data.content);
     let objectIDs = result.data.content.map((singleObject: any) => singleObject.id);
     // let objectID = '0';
     // if (result.data.content && result.data.content.length > 0) {
@@ -155,48 +198,95 @@ export class SevOneManager {
   async getIndicators(
     token: any,
     queryType: number,
-    deviceId: string | undefined,
-    objectId: string | undefined,
+    device: Array<SelectableValue<string>>,
+    object: Array<SelectableValue<string>>,
     size: number,
     page: number
   ) {
-    if (deviceId === undefined || deviceId === null || objectId === undefined || objectId === null) {
+    if (device.length === 0 || object.length === 0) {
       return [];
     }
-    let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators?page=${page}&size=${size}`;
-    let data = await this.request(url, token);
+    // let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators?page=${page}&size=${size}`;
+    // let data = await this.request(url, token);
+    let responses: any[] = [];
+    object.forEach((singleObject) => {
+      let deviceLabel = singleObject.label?.substring(0, singleObject.label?.indexOf('--'));
+      let matchingDevice: Array<SelectableValue<string>> = device.filter(
+        (singleDevice) => singleDevice.label === deviceLabel
+      );
+      if (matchingDevice.length === 0) {
+        return;
+      }
+      let url = `/api/v2/devices/${matchingDevice[0].value}/objects/${singleObject.value}/indicators?page=${page}&size=${size}`;
+      responses.push(
+        this.request(url, token)
+          .then((response) => {
+            return response.data.content;
+          })
+          .catch((e) => {
+            console.log(e);
+            return [];
+          })
+      );
+    });
+    responses = await Promise.all(responses);
+    let results: any = [].concat(...responses);
     if (queryType === 0) {
-      return data.data;
+      return results;
     } else if (queryType === 1) {
-      return this.mapDataToFrame(data.data.content);
+      return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(data.data.content);
+      return this.mapIndicatorDataToSelect(results, token);
     } else {
-      return this.mapDataToVariable(data.data);
+      return this.mapDataToVariable(results);
     }
   }
 
   async getIndicatorData(
     token: any,
-    deviceId: string | undefined,
-    objectId: string | undefined,
-    indicatorId: string | undefined,
+    device: Array<SelectableValue<string>>,
+    object: Array<SelectableValue<string>>,
+    indicator: Array<SelectableValue<string>>,
     starttime: number | undefined,
     endtime: number | undefined
   ) {
-    if (
-      deviceId === undefined ||
-      deviceId === null ||
-      objectId === undefined ||
-      objectId === null ||
-      indicatorId === undefined ||
-      indicatorId === null
-    ) {
+    if (device.length === 0 || object.length === 0 || indicator.length === 0) {
       return [];
     }
-    let url = `/api/v2/devices/${deviceId}/objects/${objectId}/indicators/${indicatorId}/data?endTime=${endtime}&startTime=${starttime}`;
-    let data = await this.request(url, token);
-    return this.mapIndicatorDataToFrame(data);
+    let responses: any[] = [];
+    // TODO Fix this mess
+    indicator.forEach((singleIndicator) => {
+      let objectLabel = singleIndicator.label?.substring(
+        0,
+        singleIndicator.label?.indexOf('--', singleIndicator.label?.indexOf('--') + 2)
+      );
+      let matchingObject: Array<SelectableValue<string>> = object.filter((singleObject: any) =>
+        singleObject.label.includes(objectLabel)
+      );
+
+      let deviceLabel = objectLabel?.substring(0, objectLabel.indexOf('--'));
+      let matchingDevice: Array<SelectableValue<string>> = device.filter(
+        (singleDevice) => singleDevice.label === deviceLabel
+      );
+
+      if (matchingDevice.length === 0 || matchingObject.length === 0) {
+        return;
+      }
+      let url = `/api/v2/devices/${matchingDevice[0].value}/objects/${matchingObject[0].value}/indicators/${singleIndicator.value}/data?endTime=${endtime}&startTime=${starttime}`;
+      let key = `${singleIndicator.label}`;
+      responses.push(
+        this.request(url, token)
+          .then((response) => {
+            return { [key]: response.data };
+          })
+          .catch((e) => {
+            console.log(e);
+            return { [key]: [] };
+          })
+      );
+    });
+    responses = await Promise.all(responses);
+    return this.mapIndicatorDataToFrame(responses);
   }
 
   async getDeviceGroups(token: any, queryType: number, size: number, page: number) {
@@ -207,7 +297,7 @@ export class SevOneManager {
     } else if (queryType === 3) {
       return this.mapDataToSelect(response.data.content);
     } else {
-      return this.mapDataToVariable(response.data);
+      return this.mapDataToVariable(response.data.content);
     }
   }
 
@@ -226,11 +316,11 @@ export class SevOneManager {
       );
     }
     responses = await Promise.all(responses);
-    let results = { content: [].concat(...responses) };
+    let results: any = [].concat(...responses);
     if (queryType === 1) {
-      return this.mapDataToFrame(results.content);
+      return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(results.content);
+      return this.mapDataToSelect(results);
     } else {
       return this.mapDataToVariable(results);
     }
@@ -312,36 +402,48 @@ export class SevOneManager {
     return frame;
   }
 
-  async mapIndicatorDataToFrame(result: any) {
-    const frame = new MutableDataFrame({
-      fields: [],
-    });
-    if (!(result.data.length > 0)) {
+  async mapIndicatorDataToFrame(results: any) {
+    // const frame = new MutableDataFrame({
+    //   fields: [],
+    // });
+    if (!(results.length > 0)) {
       return [];
     }
-    let filedNames = Object.keys(result.data[0]);
-    for (let i = 0; i < filedNames.length; i++) {
-      if (filedNames[i] !== 'focus') {
-        let values = result.data.map((d: any) => d[filedNames[i]]);
-
-        let fieldType = FieldType.string;
-        if (typeof values[0] === 'number') {
-          if (TIME_FILED_NAMES.includes(filedNames[i])) {
-            fieldType = FieldType.time;
-          } else {
-            fieldType = FieldType.number;
-          }
-        }
-
-        frame.addField({
-          name: filedNames[i],
-          type: fieldType,
-          values: values,
-        });
+    const dataframes = results.map((result: any) => {
+      const resultKey = Object.keys(result);
+      const frame = new MutableDataFrame({
+        fields: [],
+        name: resultKey[0],
+      });
+      let resultArray = result[resultKey[0]];
+      if (resultArray.length === 0) {
+        return;
       }
-    }
+      let filedNames = Object.keys(resultArray[0]);
+      for (let i = 0; i < filedNames.length; i++) {
+        if (filedNames[i] !== 'focus') {
+          let values = resultArray.map((d: any) => d[filedNames[i]]);
 
-    return frame;
+          let fieldType = FieldType.string;
+          if (typeof values[0] === 'number') {
+            if (TIME_FILED_NAMES.includes(filedNames[i])) {
+              fieldType = FieldType.time;
+            } else {
+              fieldType = FieldType.number;
+            }
+          }
+
+          frame.addField({
+            name: filedNames[i],
+            type: fieldType,
+            values: values,
+          });
+        }
+      }
+      return frame;
+    });
+
+    return dataframes;
   }
 
   async mapDeviceDataToFrame(result: any) {
@@ -374,7 +476,7 @@ export class SevOneManager {
   }
 
   async mapDataToVariable(result: any) {
-    let resultsparsed = result.content.map((row: any) => {
+    let resultsparsed = result.map((row: any) => {
       return { text: row.name, value: row.id };
     });
 
@@ -387,6 +489,68 @@ export class SevOneManager {
     }
     let resultsparsed = result.map((row: any) => {
       return { label: row.name, value: row.id };
+    });
+
+    return resultsparsed;
+  }
+
+  async mapObjectDataToSelect(result: any[], token: any) {
+    if (result.length === 0) {
+      return [];
+    }
+    let deviceIDs: any[] = [];
+    result.forEach((row: any) => {
+      if (!deviceIDs.includes(row.deviceId)) {
+        deviceIDs.push(row.deviceId);
+      }
+    });
+    let deviceInput: Array<SelectableValue<string>> = deviceIDs.map((deviceID) => {
+      let device: SelectableValue<string> = { value: deviceID, label: '' };
+      return device;
+    });
+    let deviceInfo: any = await this.getDevice(token, deviceInput, 0);
+
+    let resultsparsed = result.map((row: any) => {
+      let device = deviceInfo.find((singleDevice: any) => singleDevice.id === row.deviceId);
+      // return { label: row.name, value: row.id, description: `device: ${device.name}` };
+      return { label: `${device.name}--${row.name}`, value: row.id };
+    });
+
+    return resultsparsed;
+  }
+
+  async mapIndicatorDataToSelect(result: any[], token: any) {
+    if (result.length === 0) {
+      return [];
+    }
+    let deviceIDs: any[] = [];
+    let objectIDs: any[] = [];
+    result.forEach((row: any) => {
+      if (!deviceIDs.includes(row.deviceId)) {
+        deviceIDs.push(row.deviceId);
+      }
+      if (!objectIDs.includes(row.objectId)) {
+        objectIDs.push(row.objectId);
+      }
+    });
+
+    let deviceInput: Array<SelectableValue<string>> = deviceIDs.map((deviceID) => {
+      let device: SelectableValue<string> = { value: deviceID, label: '' };
+      return device;
+    });
+    let deviceInfo: any = await this.getDevice(token, deviceInput, 0);
+
+    let objectInput: Array<SelectableValue<string>> = objectIDs.map((objectID) => {
+      let object: SelectableValue<string> = { value: objectID, label: '' };
+      return object;
+    });
+
+    let objectInfo: any = await this.getObject(token, 0, deviceInput, objectInput);
+
+    let resultsparsed = result.map((row: any) => {
+      let device = deviceInfo.find((singleDevice: any) => singleDevice.id === row.deviceId);
+      let object = objectInfo.find((singleObject: any) => singleObject.id === row.objectId);
+      return { label: `${device.name}--${object.name}--${row.name}`, value: row.id };
     });
 
     return resultsparsed;

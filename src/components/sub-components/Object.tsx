@@ -4,7 +4,7 @@ import { Select, InlineField, InlineFieldRow } from '@grafana/ui';
 import { DataSource } from '../../datasource';
 
 interface SubComponentProps {
-  object: SelectableValue<string> | null;
+  object: Array<SelectableValue<string>>;
   updateQuery: (key: string, value: any) => void;
   setObject: any;
   datasource: DataSource;
@@ -43,20 +43,25 @@ const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, d
       <InlineFieldRow>
         <InlineField label="Object" labelWidth={20}>
           <Select
-            width={30}
+            width={80}
             options={objectOptions}
             defaultValue={object}
             value={object}
             isSearchable={true}
             isClearable={true}
-            isMulti={false}
+            isMulti={true}
             backspaceRemovesValue={true}
             allowCustomValue={true}
             allowCreateWhileLoading={true}
             menuPlacement="auto"
             onCreateOption={(v) => {
-              updateQuery('object', { label: v, value: v });
-              setObject({ label: v, value: v });
+              let newValue: Array<SelectableValue<string>> = [];
+              if (object.length > 0) {
+                newValue = [...object];
+              }
+              newValue.push({ label: v, value: v });
+              updateQuery('object', newValue);
+              setObject(newValue);
             }}
             onChange={(v) => {
               updateQuery('object', v);

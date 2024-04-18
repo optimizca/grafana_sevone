@@ -33,7 +33,6 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
           allResults = await datasource.sevOneConnection.getDeviceGroupMembers(token, 3, deviceGroup.value);
           results = allResults.slice(0, 20);
         }
-        console.log('allResults: ', allResults);
       } catch (err) {
         console.error('Error Loading Devices: ', err);
         results = [{ label: 'Error Loading Devices', value: '' }];
@@ -76,7 +75,7 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
       <InlineFieldRow>
         <InlineField label="Device" labelWidth={20}>
           <Select
-            width={30}
+            width={80}
             options={deviceOptions}
             defaultValue={device}
             value={device}

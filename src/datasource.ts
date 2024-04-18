@@ -154,33 +154,23 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         device.push(updatedSingleDevice);
       });
 
-      let objectID = target.object?.value;
-      let object: any[] = [];
-
-      if (target.object !== undefined && target.object !== null && typeof target.object.value === 'string') {
-        objectID = getTemplateSrv().replace(target.object.value, options.scopedVars, 'csv');
-        if (isNaN(+objectID)) {
-          let oIDs = await this.sevOneConnection.getObjectID(token, device, objectID);
-          object = object.concat(oIDs);
+      let object: Array<SelectableValue<string>> = [];
+      target.object.forEach((singleObject) => {
+        let updatedSingleObject = { ...singleObject };
+        if (typeof singleObject.value === 'string') {
+          updatedSingleObject.value = getTemplateSrv().replace(singleObject.value, options.scopedVars, 'csv');
         }
-      }
-      console.log('object: ', object);
+        object.push(updatedSingleObject);
+      });
 
-      let indicatorID = target.indicator?.value;
-
-      if (target.indicator !== undefined && target.indicator !== null && typeof target.indicator.value === 'string') {
-        indicatorID = getTemplateSrv().replace(target.indicator.value.toString(), options.scopedVars, 'csv');
-        if (isNaN(+indicatorID)) {
-          let indicatorData = this.sevOneConnection.getIndicators(token, 0, deviceID, objectID, 100, 0);
-          await indicatorData.then((response) => {
-            for (const indicator of response.content) {
-              if (indicator.name === indicatorID) {
-                indicatorID = indicator.id;
-              }
-            }
-          });
+      let indicator: Array<SelectableValue<string>> = [];
+      target.indicator.forEach((singleIndicator) => {
+        let updatedSingleIndicator = { ...singleIndicator };
+        if (typeof singleIndicator.value === 'string') {
+          updatedSingleIndicator.value = getTemplateSrv().replace(singleIndicator.value, options.scopedVars, 'csv');
         }
-      }
+        indicator.push(updatedSingleIndicator);
+      });
 
       let size = 20;
 
@@ -199,16 +189,16 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
           if (deviceGroupID !== undefined && deviceGroupID !== null && device.length === 0) {
             return this.sevOneConnection.getDeviceGroupMembers(token, 1, deviceGroupID);
           } else if (device.length > 0) {
-            return this.sevOneConnection.getDevice(token, device);
+            return this.sevOneConnection.getDevice(token, device, 1);
           } else {
             return this.sevOneConnection.getDevices(token, 1, size, page);
           }
         case 'Objects':
           return this.sevOneConnection.getObjects(token, 1, device, size, page);
         case 'Indicators':
-          return this.sevOneConnection.getIndicators(token, 1, deviceID, objectID, size, page);
+          return this.sevOneConnection.getIndicators(token, 1, device, object, size, page);
         case 'IndicatorData':
-          return this.sevOneConnection.getIndicatorData(token, deviceID, objectID, indicatorID, from, to);
+          return this.sevOneConnection.getIndicatorData(token, device, object, indicator, from, to);
         default:
           return [];
       }

@@ -4,12 +4,12 @@ import { Select, InlineField, InlineFieldRow } from '@grafana/ui';
 import { DataSource } from '../../datasource';
 
 interface SubComponentProps {
-  indicator: SelectableValue<string> | null;
+  indicator: Array<SelectableValue<string>>;
   updateQuery: (key: string, value: any) => void;
   setIndicator: any;
   datasource: DataSource;
-  device: SelectableValue<string> | null;
-  object: SelectableValue<string> | null;
+  device: Array<SelectableValue<string>>;
+  object: Array<SelectableValue<string>>;
 }
 
 const Indicator: React.FC<SubComponentProps> = ({
@@ -31,7 +31,7 @@ const Indicator: React.FC<SubComponentProps> = ({
       try {
         let token = '';
         token = await datasource.getToken();
-        results = await datasource.sevOneConnection.getIndicators(token, 3, device?.value, object?.value, 20, 0);
+        results = await datasource.sevOneConnection.getIndicators(token, 3, device, object, 20, 0);
       } catch (err) {
         console.error('Error Loading Devices: ', err);
         results = [{ label: 'Error Loading Devices', value: '' }];
@@ -51,20 +51,25 @@ const Indicator: React.FC<SubComponentProps> = ({
       <InlineFieldRow>
         <InlineField label="Indicator" labelWidth={20}>
           <Select
-            width={30}
+            width={80}
             options={indicatorOptions}
             defaultValue={indicator}
             value={indicator}
             isSearchable={true}
             isClearable={true}
-            isMulti={false}
+            isMulti={true}
             backspaceRemovesValue={true}
             allowCustomValue={true}
             allowCreateWhileLoading={true}
             menuPlacement="auto"
             onCreateOption={(v) => {
-              updateQuery('indicator', { label: v, value: v });
-              setIndicator({ label: v, value: v });
+              let newValue: Array<SelectableValue<string>> = [];
+              if (indicator.length > 0) {
+                newValue = [...indicator];
+              }
+              newValue.push({ label: v, value: v });
+              updateQuery('indicator', newValue);
+              setIndicator(newValue);
             }}
             onChange={(v) => {
               updateQuery('indicator', v);

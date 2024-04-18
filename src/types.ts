@@ -11,8 +11,8 @@ export interface MyQuery extends DataQuery {
 
   device: Array<SelectableValue<string>>;
   // TODO Turn Object and Indicator into multi-value select and Array types
-  object: SelectableValue<string> | null;
-  indicator: SelectableValue<string> | null;
+  object: Array<SelectableValue<string>>;
+  indicator: Array<SelectableValue<string>>;
   deviceGroup: SelectableValue<string> | null;
 }
 
@@ -25,8 +25,8 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
   page: 0,
   size: 20,
   device: [],
-  object: null,
-  indicator: null,
+  object: [],
+  indicator: [],
   deviceGroup: null,
 };
 
