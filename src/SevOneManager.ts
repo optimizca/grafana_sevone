@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { MutableDataFrame, FieldType, SelectableValue } from '@grafana/data';
-import { getBackendSrv } from '@grafana/runtime';
+import { getBackendSrv, getTemplateSrv } from '@grafana/runtime';
 
 import { TIME_FILED_NAMES } from './Constants';
 
@@ -64,6 +64,7 @@ export class SevOneManager {
   }
 
   async getDevice(token: any, device: Array<SelectableValue<string>>, queryType: number) {
+    device = await this.translateDevice(device, token);
     if (device.length === 0) {
       return [];
     }
@@ -89,6 +90,7 @@ export class SevOneManager {
     }
   }
 
+  // OLD
   async getDeviceID(token: any, deviceName: string) {
     let url = `/api/v2/devices/filter`;
     let body = { name: deviceName };
@@ -98,6 +100,27 @@ export class SevOneManager {
       deviceID = result.data.content[0].id;
     }
     return deviceID;
+  }
+
+  async getDeviceOption(token: any, deviceIdentifier: any): Promise<SelectableValue<string>> {
+    let body = {};
+    if (isNaN(+deviceIdentifier)) {
+      // Value is a string or name of device
+      body = { name: deviceIdentifier };
+    } else {
+      // Value is a number or ID of device
+      body = { ids: [+deviceIdentifier] };
+    }
+    let url = `/api/v2/devices/filter`;
+    let result: any = await this.postRequest(url, token, body);
+    if (result.data.content.length === 0) {
+      return {};
+    }
+    let deviceOption: SelectableValue<string> = {
+      label: result.data.content[0].name,
+      value: result.data.content[0].id,
+    };
+    return deviceOption;
   }
 
   async getDevices(token: any, queryType: number, size: number, page: number) {
@@ -120,6 +143,8 @@ export class SevOneManager {
     device: Array<SelectableValue<string>>,
     object: Array<SelectableValue<string>>
   ) {
+    device = await this.translateDevice(device, token);
+    object = await this.translateObject(device, object, token);
     if (device.length === 0 || object.length === 0) {
       return [];
     }
@@ -153,7 +178,46 @@ export class SevOneManager {
     }
   }
 
+  async getObjectOption(
+    token: any,
+    device: Array<SelectableValue<string>>,
+    objectIdentifier: any
+  ): Promise<Array<SelectableValue<string>>> {
+    let objectOptions: Array<SelectableValue<string>> = [];
+    let body = {};
+    if (isNaN(+objectIdentifier)) {
+      // Value is a string or name of device
+      body = { name: objectIdentifier, deviceIds: device.map((singleDevice) => singleDevice.value) };
+    } else {
+      // Value is a number or ID of device
+      body = {
+        objectIds: device.map((singleDevice) => {
+          return { objectId: objectIdentifier, deviceId: singleDevice.value };
+        }),
+      };
+    }
+    let url = `/api/v2/devices/objects/filter`;
+    let result: any = await this.postRequest(url, token, body);
+    if (result.data.content.length === 0) {
+      return [];
+    }
+    if (isNaN(+objectIdentifier)) {
+      // Ensure result is exact match of object name provided in Grafana as the API does a contains search
+      result.data.content = result.data.content.filter((object: any) => object.name === objectIdentifier);
+    }
+    result.data.content.forEach((singleResult: any) => {
+      let matchingDevice = device.find((singleDevice: any) => singleDevice.value === singleResult.deviceId);
+      let objectOption: SelectableValue<string> = {
+        label: `${matchingDevice?.label}--${singleResult.name}`,
+        value: singleResult.id,
+      };
+      objectOptions.push(objectOption);
+    });
+    return objectOptions;
+  }
+
   async getObjects(token: any, queryType: number, device: Array<SelectableValue<string>>, size: number, page: number) {
+    device = await this.translateDevice(device, token);
     if (device.length === 0) {
       return [];
     }
@@ -180,6 +244,7 @@ export class SevOneManager {
   }
 
   async getObjectID(token: any, device: Array<SelectableValue<string>>, objectName: string) {
+    device = await this.translateDevice(device, token);
     if (device.length === 0) {
       return [];
     }
@@ -203,6 +268,8 @@ export class SevOneManager {
     size: number,
     page: number
   ) {
+    device = await this.translateDevice(device, token);
+    object = await this.translateObject(device, object, token);
     if (device.length === 0 || object.length === 0) {
       return [];
     }
@@ -236,10 +303,39 @@ export class SevOneManager {
     } else if (queryType === 1) {
       return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapIndicatorDataToSelect(results, token);
+      return this.mapIndicatorDataToSelect(results, device, object);
     } else {
       return this.mapDataToVariable(results);
     }
+  }
+
+  async getIndicatorOption(
+    token: any,
+    inputDevice: Array<SelectableValue<string>>,
+    inputObject: Array<SelectableValue<string>>,
+    indicatorIdentifier: any
+  ): Promise<Array<SelectableValue<string>>> {
+    let results = await this.getIndicators(token, 0, inputDevice, inputObject, 100, 0);
+    if (results.length === 0) {
+      return [];
+    }
+    let foundIndicators: any[] = [];
+    if (isNaN(+indicatorIdentifier)) {
+      // Value is a string or name of device
+      foundIndicators = results.filter((result: any) => result.name === indicatorIdentifier);
+    } else {
+      // Value is a number or ID of device
+      foundIndicators = results.filter((result: any) => result.id === +indicatorIdentifier);
+    }
+    let indicatorObjects: Array<SelectableValue<string>> = foundIndicators.map((foundIndicator) => {
+      let matchingObject = inputObject.find((singleObject) => singleObject.value === foundIndicator.objectId);
+      let indicatorObject: SelectableValue<string> = {
+        label: `${matchingObject?.label}--${foundIndicator.name}`,
+        value: foundIndicator.id,
+      };
+      return indicatorObject;
+    });
+    return indicatorObjects;
   }
 
   async getIndicatorData(
@@ -250,11 +346,13 @@ export class SevOneManager {
     starttime: number | undefined,
     endtime: number | undefined
   ) {
+    device = await this.translateDevice(device, token);
+    object = await this.translateObject(device, object, token);
+    indicator = await this.translateIndicator(device, object, indicator, token);
     if (device.length === 0 || object.length === 0 || indicator.length === 0) {
       return [];
     }
     let responses: any[] = [];
-    // TODO Fix this mess
     indicator.forEach((singleIndicator) => {
       let objectLabel = singleIndicator.label?.substring(
         0,
@@ -519,7 +617,11 @@ export class SevOneManager {
     return resultsparsed;
   }
 
-  async mapIndicatorDataToSelect(result: any[], token: any) {
+  async mapIndicatorDataToSelect(
+    result: any[],
+    device: Array<SelectableValue<string>>,
+    object: Array<SelectableValue<string>>
+  ) {
     if (result.length === 0) {
       return [];
     }
@@ -534,25 +636,151 @@ export class SevOneManager {
       }
     });
 
-    let deviceInput: Array<SelectableValue<string>> = deviceIDs.map((deviceID) => {
-      let device: SelectableValue<string> = { value: deviceID, label: '' };
-      return device;
-    });
-    let deviceInfo: any = await this.getDevice(token, deviceInput, 0);
-
-    let objectInput: Array<SelectableValue<string>> = objectIDs.map((objectID) => {
-      let object: SelectableValue<string> = { value: objectID, label: '' };
-      return object;
-    });
-
-    let objectInfo: any = await this.getObject(token, 0, deviceInput, objectInput);
-
     let resultsparsed = result.map((row: any) => {
-      let device = deviceInfo.find((singleDevice: any) => singleDevice.id === row.deviceId);
-      let object = objectInfo.find((singleObject: any) => singleObject.id === row.objectId);
-      return { label: `${device.name}--${object.name}--${row.name}`, value: row.id };
+      let matchingObject = object.find((singleObject: any) => singleObject.value === row.objectId);
+      return { label: `${matchingObject?.label}--${row.name}`, value: row.id };
     });
 
     return resultsparsed;
+  }
+
+  getVariableValue(variableName: string) {
+    const variables = getTemplateSrv().getVariables() as any;
+    const variable = variables.find((v: any) => v.id === variableName);
+    if (variable && typeof variable.current !== 'undefined') {
+      if (variable.current.value.length > 0 && variable.current.value[0] === '$__all') {
+        if (typeof variable.allValue !== 'undefined') {
+          // All Option selected and All Value provided
+          return variable.allValue;
+        } else {
+          // All Option selected so loop over all options in the variable except special All option
+          return variable.options.filter((option: any) => option.value !== '$__all');
+        }
+      }
+      // All Option was not selected so we return either the single or multi value
+      return variable.current.value;
+    }
+    // Couldn't find a variable with the name provided so we were given a non variable value and will return it
+    return variableName;
+  }
+
+  async translateDevice(inputDevice: Array<SelectableValue<string>>, token: any) {
+    let device: Array<SelectableValue<string>> = [];
+    for (const singleDevice of inputDevice) {
+      if (singleDevice.value !== undefined) {
+        if (typeof singleDevice.value === 'string') {
+          let variableName = singleDevice.value.substring(1);
+          let realValues = this.getVariableValue(variableName);
+          if (typeof realValues === 'object') {
+            // Handle multi-select variables
+            let devicesBasedOnVariable: Array<SelectableValue<string>> = [];
+            for (const realValue of realValues) {
+              let deviceOption: SelectableValue<string> = await this.getDeviceOption(token, realValue);
+              devicesBasedOnVariable.push(deviceOption);
+            }
+            device = device.concat(devicesBasedOnVariable);
+          } else {
+            // Handle single select variables
+            let deviceBasedOnVariable: SelectableValue<string> = await this.getDeviceOption(token, realValues);
+            device.push(deviceBasedOnVariable);
+          }
+        } else {
+          // This option of the select was not a variable so it is returned as is
+          device.push(singleDevice);
+        }
+      }
+    }
+    return device;
+  }
+
+  async translateObject(
+    inputDevice: Array<SelectableValue<string>>,
+    inputObject: Array<SelectableValue<string>>,
+    token: any
+  ) {
+    let object: Array<SelectableValue<string>> = [];
+    for (const singleObject of inputObject) {
+      if (singleObject.value !== undefined) {
+        if (typeof singleObject.value === 'string') {
+          let variableName = singleObject.value;
+          if (variableName.indexOf('$') === 0) {
+            variableName = singleObject.value.substring(1);
+          }
+          let realValues = this.getVariableValue(variableName);
+          if (typeof realValues === 'object') {
+            // Handle multi-select variables
+            let objectsBasedOnVariable: Array<SelectableValue<string>> = [];
+            for (const realValue of realValues) {
+              let objectOption: Array<SelectableValue<string>> = await this.getObjectOption(
+                token,
+                inputDevice,
+                realValue
+              );
+              objectsBasedOnVariable = objectsBasedOnVariable.concat(objectOption);
+            }
+            object = object.concat(objectsBasedOnVariable);
+          } else {
+            // Handle single select variables
+            let objectBasedOnVariable: Array<SelectableValue<string>> = await this.getObjectOption(
+              token,
+              inputDevice,
+              realValues
+            );
+            object = object.concat(objectBasedOnVariable);
+          }
+        } else {
+          // This option of the select was not a variable so it is returned as is
+          object.push(singleObject);
+        }
+      }
+    }
+    return object;
+  }
+
+  async translateIndicator(
+    inputDevice: Array<SelectableValue<string>>,
+    inputObject: Array<SelectableValue<string>>,
+    inputIndicator: Array<SelectableValue<string>>,
+    token: any
+  ) {
+    let indicator: Array<SelectableValue<string>> = [];
+    for (const singleIndicator of inputIndicator) {
+      if (singleIndicator.value !== undefined) {
+        if (typeof singleIndicator.value === 'string') {
+          let variableName = singleIndicator.value;
+          if (variableName.indexOf('$') === 0) {
+            variableName = singleIndicator.value.substring(1);
+          }
+          let realValues = this.getVariableValue(variableName);
+          if (typeof realValues === 'object') {
+            // Handle multi-select variables
+            let indicatorsBasedOnVariable: Array<SelectableValue<string>> = [];
+            for (const realValue of realValues) {
+              let indicatorOption: SelectableValue<string> = await this.getIndicatorOption(
+                token,
+                inputDevice,
+                inputObject,
+                realValue
+              );
+              indicatorsBasedOnVariable = indicatorsBasedOnVariable.concat(indicatorOption);
+            }
+            indicator = indicator.concat(indicatorsBasedOnVariable);
+          } else {
+            // Handle single select variables
+            let indicatorBasedOnVariable: SelectableValue<string> = await this.getIndicatorOption(
+              token,
+              inputDevice,
+              inputObject,
+              realValues
+            );
+            indicator = indicator.concat(indicatorBasedOnVariable);
+          }
+        } else {
+          // This option of the select was not a variable so it is returned as is
+          indicator.push(singleIndicator);
+        }
+      }
+    }
+    return indicator;
   }
 }

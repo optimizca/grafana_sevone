@@ -5,6 +5,8 @@ import {
   DataSourceInstanceSettings,
   LoadingState,
   SelectableValue,
+  DataSourceVariableSupport,
+  VariableSupportType,
 } from '@grafana/data';
 
 import _ from 'lodash';
@@ -46,33 +48,16 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
     let queryType: string = query.selectedQueryCategory as string;
 
-    let deviceID = '';
-
-    if (query.deviceID) {
-      deviceID = getTemplateSrv().replace(query.deviceID, options.scopedVars, 'csv');
-      if (isNaN(+deviceID)) {
-        deviceID = await this.sevOneConnection.getDeviceID(token, deviceID);
-      }
-    }
-
-    let objectID = '';
-
-    if (query.objectID) {
-      objectID = getTemplateSrv().replace(query.objectID, options.scopedVars, 'csv');
-      if (isNaN(+objectID)) {
-        objectID = await this.sevOneConnection.getObjectID(token, deviceID, objectID);
-      }
-    }
-
+    let deviceID: Array<SelectableValue<string>> = [{ label: '', value: query.deviceID }];
+    let objectID: Array<SelectableValue<string>> = [{ label: '', value: query.objectID }];
     let size = 20;
+    let page = 0;
 
     if (typeof query.size === 'string') {
       if (query.size) {
         size = query.size;
       }
     }
-
-    let page = 0;
 
     if (typeof query.page === 'string') {
       if (query.page) {
@@ -145,60 +130,28 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         // }
       }
 
-      let device: Array<SelectableValue<string>> = [];
-      target.device.forEach((singleDevice) => {
-        let updatedSingleDevice = { ...singleDevice };
-        if (typeof singleDevice.value === 'string') {
-          updatedSingleDevice.value = getTemplateSrv().replace(singleDevice.value, options.scopedVars, 'csv');
-        }
-        device.push(updatedSingleDevice);
-      });
-
-      let object: Array<SelectableValue<string>> = [];
-      target.object.forEach((singleObject) => {
-        let updatedSingleObject = { ...singleObject };
-        if (typeof singleObject.value === 'string') {
-          updatedSingleObject.value = getTemplateSrv().replace(singleObject.value, options.scopedVars, 'csv');
-        }
-        object.push(updatedSingleObject);
-      });
-
-      let indicator: Array<SelectableValue<string>> = [];
-      target.indicator.forEach((singleIndicator) => {
-        let updatedSingleIndicator = { ...singleIndicator };
-        if (typeof singleIndicator.value === 'string') {
-          updatedSingleIndicator.value = getTemplateSrv().replace(singleIndicator.value, options.scopedVars, 'csv');
-        }
-        indicator.push(updatedSingleIndicator);
-      });
-
-      let size = 20;
-
-      if (typeof target.size === 'string') {
-        size = target.size;
-      }
-
-      let page = 0;
-
-      if (typeof target.page === 'string') {
-        page = target.page;
-      }
-
       switch (queryType) {
         case 'Devices':
-          if (deviceGroupID !== undefined && deviceGroupID !== null && device.length === 0) {
+          if (deviceGroupID !== undefined && deviceGroupID !== null && target.device.length === 0) {
             return this.sevOneConnection.getDeviceGroupMembers(token, 1, deviceGroupID);
-          } else if (device.length > 0) {
-            return this.sevOneConnection.getDevice(token, device, 1);
+          } else if (target.device.length > 0) {
+            return this.sevOneConnection.getDevice(token, target.device, 1);
           } else {
-            return this.sevOneConnection.getDevices(token, 1, size, page);
+            return this.sevOneConnection.getDevices(token, 1, target.size, target.page);
           }
         case 'Objects':
-          return this.sevOneConnection.getObjects(token, 1, device, size, page);
+          return this.sevOneConnection.getObjects(token, 1, target.device, target.size, target.page);
         case 'Indicators':
-          return this.sevOneConnection.getIndicators(token, 1, device, object, size, page);
+          return this.sevOneConnection.getIndicators(token, 1, target.device, target.object, target.size, target.page);
         case 'IndicatorData':
-          return this.sevOneConnection.getIndicatorData(token, device, object, indicator, from, to);
+          return this.sevOneConnection.getIndicatorData(
+            token,
+            target.device,
+            target.object,
+            target.indicator,
+            from,
+            to
+          );
         default:
           return [];
       }
@@ -237,5 +190,11 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     });
     token = result?.data.token || '';
     return token;
+  }
+}
+
+export class MyDataSourceVariableSupport extends DataSourceVariableSupport<DataSource, MyQuery, MyDataSourceOptions> {
+  getType(): VariableSupportType {
+    return VariableSupportType.Datasource;
   }
 }

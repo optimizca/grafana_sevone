@@ -10,7 +10,6 @@ export interface MyQuery extends DataQuery {
   size: number;
 
   device: Array<SelectableValue<string>>;
-  // TODO Turn Object and Indicator into multi-value select and Array types
   object: Array<SelectableValue<string>>;
   indicator: Array<SelectableValue<string>>;
   deviceGroup: SelectableValue<string> | null;
