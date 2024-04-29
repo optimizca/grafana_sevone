@@ -45,10 +45,4 @@ export interface MySecureJsonData {
   password?: string;
 }
 
-export interface MyVariableQuery {
-  selectedQueryCategory: string;
-  deviceID: string;
-  objectID: string;
-  page: number;
-  size: number;
-}
+export interface MyVariableQuery extends MyQuery {}

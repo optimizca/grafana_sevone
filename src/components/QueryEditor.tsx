@@ -23,7 +23,7 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
 
   return (
     <>
-      <QueryCategory query={query} updateQuery={updateQuery} datasource={datasource} />
+      <QueryCategory query={query} updateQuery={updateQuery} datasource={datasource} isVariableEditor={false} />
 
       {selectedQueryCategory.value === 'Devices' && (
         <Devices query={query} updateQuery={updateQuery} datasource={datasource} />

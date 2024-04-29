@@ -86,7 +86,7 @@ export class SevOneManager {
     } else if (queryType === 1) {
       return this.mapDeviceDataToFrame(results);
     } else {
-      return results;
+      return this.mapDataToVariable(results);
     }
   }
 
@@ -447,6 +447,7 @@ export class SevOneManager {
       return [];
     }
     let filedNames = Object.keys(result[0]);
+    filedNames = this.moveNameFieldToFirstPosition(filedNames);
     for (let i = 0; i < filedNames.length; i++) {
       let values = result.map((d: any) => d[filedNames[i]]);
 
@@ -549,6 +550,7 @@ export class SevOneManager {
       fields: [],
     });
     let filedNames = Object.keys(result[0]);
+    filedNames = this.moveNameFieldToFirstPosition(filedNames);
     for (let i = 0; i < filedNames.length; i++) {
       if (filedNames[i] !== 'pluginInfo') {
         // let values = [result[filedNames[i]]];
@@ -782,5 +784,14 @@ export class SevOneManager {
       }
     }
     return indicator;
+  }
+
+  moveNameFieldToFirstPosition(fields: string[]) {
+    const nameIndex = fields.indexOf('name');
+    if (nameIndex > 0) {
+      fields.splice(nameIndex, 1);
+      fields.unshift('name');
+    }
+    return fields;
   }
 }

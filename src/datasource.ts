@@ -4,17 +4,12 @@ import {
   DataSourceApi,
   DataSourceInstanceSettings,
   LoadingState,
-  SelectableValue,
   DataSourceVariableSupport,
   VariableSupportType,
 } from '@grafana/data';
-
-import _ from 'lodash';
-
-import { MyQuery, MyDataSourceOptions, MyVariableQuery, DEFAULT_QUERY } from './types';
-
 import { getBackendSrv, getTemplateSrv } from '@grafana/runtime';
-
+import _ from 'lodash';
+import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, MyVariableQuery } from './types';
 import { SevOneManager } from 'SevOneManager';
 
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
@@ -37,53 +32,42 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     this.sevOneConnection = new SevOneManager(connectionOptions);
   }
 
-  async metricFindQuery(query: MyVariableQuery, options?: any) {
+  async metricFindQuery(query: MyVariableQuery, options: any) {
     // Retrieve DataQueryResponse based on query.
-
     let token = '';
     let tokenResponse = this.getToken();
     await tokenResponse.then((response) => {
       token = response;
     });
 
-    let queryType: string = query.selectedQueryCategory as string;
-
-    let deviceID: Array<SelectableValue<string>> = [{ label: '', value: query.deviceID }];
-    let objectID: Array<SelectableValue<string>> = [{ label: '', value: query.objectID }];
-    let size = 20;
-    let page = 0;
-
-    if (typeof query.size === 'string') {
-      if (query.size) {
-        size = query.size;
-      }
+    let queryType = DEFAULT_QUERY.selectedQueryCategory?.value;
+    if (query.selectedQueryCategory !== undefined && query.selectedQueryCategory !== null) {
+      queryType = query.selectedQueryCategory.value;
     }
 
-    if (typeof query.page === 'string') {
-      if (query.page) {
-        page = query.page;
-      }
+    let deviceGroupID = query.deviceGroup?.value;
+
+    if (query.deviceGroup !== undefined && query.deviceGroup !== null && typeof query.deviceGroup.value === 'string') {
+      deviceGroupID = getTemplateSrv().replace(query.deviceGroup.value, options.scopedVars, 'csv');
+      // TODO See if filter function is available for device groups to convert name into ID
+      // if (isNaN(+deviceGroupID)) {
+      //   deviceGroupID = await this.sevOneConnection.getDeviceID(token, deviceGroupID);
+      // }
     }
 
     switch (queryType) {
       case 'Devices':
-        if (query.page && query.size) {
-          return this.sevOneConnection.getDevices(token, 2, size, page);
+        if (deviceGroupID !== undefined && deviceGroupID !== null && query.device.length === 0) {
+          return this.sevOneConnection.getDeviceGroupMembers(token, 2, deviceGroupID);
+        } else if (query.device.length > 0) {
+          return this.sevOneConnection.getDevice(token, query.device, 2);
         } else {
-          return this.sevOneConnection.getAllDevices(token, 1);
+          return this.sevOneConnection.getDevices(token, 2, query.size, query.page);
         }
       case 'Objects':
-        if (query.deviceID) {
-          return this.sevOneConnection.getObjects(token, 2, deviceID, size, page);
-        } else {
-          return [];
-        }
+        return this.sevOneConnection.getObjects(token, 2, query.device, query.size, query.page);
       case 'Indicators':
-        if (query.deviceID && query.objectID) {
-          return this.sevOneConnection.getIndicators(token, 2, deviceID, objectID, size, page);
-        } else {
-          return [];
-        }
+        return this.sevOneConnection.getIndicators(token, 2, query.device, query.object, query.size, query.page);
       default:
         return [];
     }

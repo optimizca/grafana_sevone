@@ -7,9 +7,10 @@ interface SubComponentProps {
   query: MyQuery;
   updateQuery: (key: string, value: any) => void;
   datasource: DataSource;
+  isVariableEditor: boolean;
 }
 
-const QueryCategory: React.FC<SubComponentProps> = ({ query, updateQuery, datasource }) => {
+const QueryCategory: React.FC<SubComponentProps> = ({ query, updateQuery, datasource, isVariableEditor }) => {
   // console.log('render Query Category component');
 
   const [selectedQueryCategory, setSelectedQueryCategory] = React.useState(query.selectedQueryCategory);
@@ -36,6 +37,10 @@ const QueryCategory: React.FC<SubComponentProps> = ({ query, updateQuery, dataso
       description: 'Grab the Indicator Metric from SevOne',
     },
   ];
+
+  if (isVariableEditor === true) {
+    queryOptions = queryOptions.filter((option) => option.value !== 'IndicatorData');
+  }
 
   return (
     <div>
