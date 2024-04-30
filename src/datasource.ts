@@ -6,10 +6,11 @@ import {
   LoadingState,
   DataSourceVariableSupport,
   VariableSupportType,
+  MetricFindValue,
 } from '@grafana/data';
 import { getBackendSrv, getTemplateSrv } from '@grafana/runtime';
-import _ from 'lodash';
-import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, MyVariableQuery } from './types';
+import _, { defaults } from 'lodash';
+import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, MyVariableQuery, DEFAULT_VARIABLE_QUERY } from './types';
 import { SevOneManager } from 'SevOneManager';
 
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
@@ -32,8 +33,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     this.sevOneConnection = new SevOneManager(connectionOptions);
   }
 
-  async metricFindQuery(query: MyVariableQuery, options: any) {
+  async metricFindQuery(query: MyVariableQuery, options: any): Promise<MetricFindValue[]> {
     // Retrieve DataQueryResponse based on query.
+    query = defaults(query, DEFAULT_VARIABLE_QUERY);
     let token = '';
     let tokenResponse = this.getToken();
     await tokenResponse.then((response) => {
@@ -55,19 +57,32 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       // }
     }
 
+    let regexFilter = query.regexFilter;
+    if (query.useRegexFilter === false) {
+      regexFilter = '';
+    }
+
     switch (queryType) {
       case 'Devices':
         if (deviceGroupID !== undefined && deviceGroupID !== null && query.device.length === 0) {
-          return this.sevOneConnection.getDeviceGroupMembers(token, 2, deviceGroupID);
+          return this.sevOneConnection.getDeviceGroupMembers(token, 2, deviceGroupID, regexFilter);
         } else if (query.device.length > 0) {
-          return this.sevOneConnection.getDevice(token, query.device, 2);
+          return this.sevOneConnection.getDevice(token, query.device, 2, regexFilter);
         } else {
-          return this.sevOneConnection.getDevices(token, 2, query.size, query.page);
+          return this.sevOneConnection.getDevices(token, 2, query.size, query.page, regexFilter);
         }
       case 'Objects':
-        return this.sevOneConnection.getObjects(token, 2, query.device, query.size, query.page);
+        return this.sevOneConnection.getObjects(token, 2, query.device, query.size, query.page, regexFilter);
       case 'Indicators':
-        return this.sevOneConnection.getIndicators(token, 2, query.device, query.object, query.size, query.page);
+        return this.sevOneConnection.getIndicators(
+          token,
+          2,
+          query.device,
+          query.object,
+          query.size,
+          query.page,
+          regexFilter
+        );
       default:
         return [];
     }
@@ -117,16 +132,24 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       switch (queryType) {
         case 'Devices':
           if (deviceGroupID !== undefined && deviceGroupID !== null && target.device.length === 0) {
-            return this.sevOneConnection.getDeviceGroupMembers(token, 1, deviceGroupID);
+            return this.sevOneConnection.getDeviceGroupMembers(token, 1, deviceGroupID, '');
           } else if (target.device.length > 0) {
-            return this.sevOneConnection.getDevice(token, target.device, 1);
+            return this.sevOneConnection.getDevice(token, target.device, 1, '');
           } else {
-            return this.sevOneConnection.getDevices(token, 1, target.size, target.page);
+            return this.sevOneConnection.getDevices(token, 1, target.size, target.page, '');
           }
         case 'Objects':
-          return this.sevOneConnection.getObjects(token, 1, target.device, target.size, target.page);
+          return this.sevOneConnection.getObjects(token, 1, target.device, target.size, target.page, '');
         case 'Indicators':
-          return this.sevOneConnection.getIndicators(token, 1, target.device, target.object, target.size, target.page);
+          return this.sevOneConnection.getIndicators(
+            token,
+            1,
+            target.device,
+            target.object,
+            target.size,
+            target.page,
+            ''
+          );
         case 'IndicatorData':
           return this.sevOneConnection.getIndicatorData(
             token,

@@ -27,10 +27,10 @@ const Device: React.FC<SubComponentProps> = ({ device, updateQuery, setDevice, d
         let token = '';
         token = await datasource.getToken();
         if (deviceGroup === undefined || deviceGroup === null) {
-          results = await datasource.sevOneConnection.getDevices(token, 3, 20, 0);
+          results = await datasource.sevOneConnection.getDevices(token, 3, 20, 0, '');
           allResults = await datasource.sevOneConnection.getAllDevices(token, 3);
         } else {
-          allResults = await datasource.sevOneConnection.getDeviceGroupMembers(token, 3, deviceGroup.value);
+          allResults = await datasource.sevOneConnection.getDeviceGroupMembers(token, 3, deviceGroup.value, '');
           results = allResults.slice(0, 20);
         }
       } catch (err) {

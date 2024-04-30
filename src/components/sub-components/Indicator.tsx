@@ -31,7 +31,7 @@ const Indicator: React.FC<SubComponentProps> = ({
       try {
         let token = '';
         token = await datasource.getToken();
-        results = await datasource.sevOneConnection.getIndicators(token, 3, device, object, 20, 0);
+        results = await datasource.sevOneConnection.getIndicators(token, 3, device, object, 20, 0, '');
       } catch (err) {
         console.error('Error Loading Devices: ', err);
         results = [{ label: 'Error Loading Devices', value: '' }];

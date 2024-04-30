@@ -29,20 +29,35 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
   deviceGroup: null,
 };
 
-/**
- * These are options configured for each DataSource instance
- */
+export interface MyVariableQuery extends MyQuery {
+  useRegexFilter: boolean;
+  regexFilter: string;
+}
+
+export const DEFAULT_VARIABLE_QUERY: Partial<MyVariableQuery> = {
+  selectedQueryCategory: {
+    label: 'Devices',
+    value: 'Devices',
+    description: 'Grab All Devices Info from SevOne',
+  },
+  page: 0,
+  size: 20,
+  device: [],
+  object: [],
+  indicator: [],
+  deviceGroup: null,
+  useRegexFilter: false,
+  regexFilter: '',
+};
+
+// These are options configured for each DataSource instance
 export interface MyDataSourceOptions extends DataSourceJsonData {
   url?: string;
   username?: string;
   tlsSkipVerify?: boolean;
 }
 
-/**
- * Value that is used in the backend, but never sent over HTTP to the frontend
- */
+// Value that is used in the backend, but never sent over HTTP to the frontend
 export interface MySecureJsonData {
   password?: string;
 }
-
-export interface MyVariableQuery extends MyQuery {}

@@ -63,7 +63,7 @@ export class SevOneManager {
     }
   }
 
-  async getDevice(token: any, device: Array<SelectableValue<string>>, queryType: number) {
+  async getDevice(token: any, device: Array<SelectableValue<string>>, queryType: number, regexFilter: string) {
     device = await this.translateDevice(device, token);
     if (device.length === 0) {
       return [];
@@ -86,6 +86,7 @@ export class SevOneManager {
     } else if (queryType === 1) {
       return this.mapDeviceDataToFrame(results);
     } else {
+      results = this.applyVariableRegexFilter(results, regexFilter);
       return this.mapDataToVariable(results);
     }
   }
@@ -123,7 +124,7 @@ export class SevOneManager {
     return deviceOption;
   }
 
-  async getDevices(token: any, queryType: number, size: number, page: number) {
+  async getDevices(token: any, queryType: number, size: number, page: number, regexFilter: string) {
     let url = `/api/v2/devices?includeCount=false&page=${page}&size=${size}`;
     let data = await this.request(url, token);
     if (queryType === 0) {
@@ -133,6 +134,7 @@ export class SevOneManager {
     } else if (queryType === 3) {
       return this.mapDataToSelect(data.data.content);
     } else {
+      data.data.content = this.applyVariableRegexFilter(data.data.content, regexFilter);
       return this.mapDataToVariable(data.data.content);
     }
   }
@@ -216,7 +218,14 @@ export class SevOneManager {
     return objectOptions;
   }
 
-  async getObjects(token: any, queryType: number, device: Array<SelectableValue<string>>, size: number, page: number) {
+  async getObjects(
+    token: any,
+    queryType: number,
+    device: Array<SelectableValue<string>>,
+    size: number,
+    page: number,
+    regexFilter: string
+  ) {
     device = await this.translateDevice(device, token);
     if (device.length === 0) {
       return [];
@@ -239,6 +248,7 @@ export class SevOneManager {
     } else if (queryType === 3) {
       return this.mapObjectDataToSelect(results, token);
     } else {
+      results = this.applyVariableRegexFilter(results, regexFilter);
       return this.mapDataToVariable(results);
     }
   }
@@ -266,7 +276,8 @@ export class SevOneManager {
     device: Array<SelectableValue<string>>,
     object: Array<SelectableValue<string>>,
     size: number,
-    page: number
+    page: number,
+    regexFilter: string
   ) {
     device = await this.translateDevice(device, token);
     object = await this.translateObject(device, object, token);
@@ -305,6 +316,7 @@ export class SevOneManager {
     } else if (queryType === 3) {
       return this.mapIndicatorDataToSelect(results, device, object);
     } else {
+      results = this.applyVariableRegexFilter(results, regexFilter);
       return this.mapDataToVariable(results);
     }
   }
@@ -315,7 +327,7 @@ export class SevOneManager {
     inputObject: Array<SelectableValue<string>>,
     indicatorIdentifier: any
   ): Promise<Array<SelectableValue<string>>> {
-    let results = await this.getIndicators(token, 0, inputDevice, inputObject, 100, 0);
+    let results = await this.getIndicators(token, 0, inputDevice, inputObject, 100, 0, '');
     if (results.length === 0) {
       return [];
     }
@@ -424,7 +436,7 @@ export class SevOneManager {
     }
   }
 
-  async getDeviceGroupMembers(token: any, queryType: number, deviceGroupID: string | undefined) {
+  async getDeviceGroupMembers(token: any, queryType: number, deviceGroupID: string | undefined, regexFilter: string) {
     if (deviceGroupID === undefined || deviceGroupID === null) {
       return [];
     }
@@ -435,6 +447,7 @@ export class SevOneManager {
     } else if (queryType === 3) {
       return this.mapDataToSelect(response.data.devices);
     } else {
+      response.data.devices = this.applyVariableRegexFilter(response.data.devices, regexFilter);
       return this.mapDataToVariable(response.data.devices);
     }
   }
@@ -608,7 +621,7 @@ export class SevOneManager {
       let device: SelectableValue<string> = { value: deviceID, label: '' };
       return device;
     });
-    let deviceInfo: any = await this.getDevice(token, deviceInput, 0);
+    let deviceInfo: any = await this.getDevice(token, deviceInput, 0, '');
 
     let resultsparsed = result.map((row: any) => {
       let device = deviceInfo.find((singleDevice: any) => singleDevice.id === row.deviceId);
@@ -793,5 +806,14 @@ export class SevOneManager {
       fields.unshift('name');
     }
     return fields;
+  }
+
+  applyVariableRegexFilter(results: any[], regexFilter: string) {
+    if (regexFilter.length === 0) {
+      return results;
+    }
+    const regex = new RegExp(regexFilter);
+    results = results.filter((result) => result.name.match(regex));
+    return results;
   }
 }
