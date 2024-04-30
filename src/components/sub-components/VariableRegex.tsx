@@ -14,7 +14,13 @@ const VariableRegex: React.FC<SubComponentProps> = ({ query, updateQuery }) => {
   return (
     <>
       <InlineFieldRow>
-        <InlineField label="Regex Filter" labelWidth={20}>
+        <InlineField
+          label="Regex Filter"
+          labelWidth={20}
+          tooltip={
+            "This differs from the Regex field provided by Grafana because Grafana's Regex field only filters the variable values while our field will filter the variable labels"
+          }
+        >
           <InlineSwitch
             value={useRegexFilter}
             onChange={(e: React.FormEvent<HTMLInputElement>) => {
