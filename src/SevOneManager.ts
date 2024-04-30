@@ -57,7 +57,7 @@ export class SevOneManager {
     if (queryType === 0) {
       return results;
     } else if (queryType === 3) {
-      return this.mapDataToSelect(results);
+      return this.mapDataToDeviceSelect(results);
     } else {
       return this.mapDataToVariable(results);
     }
@@ -132,7 +132,7 @@ export class SevOneManager {
     } else if (queryType === 1) {
       return this.mapDataToFrame(data.data.content);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(data.data.content);
+      return this.mapDataToDeviceSelect(data.data.content);
     } else {
       data.data.content = this.applyVariableRegexFilter(data.data.content, regexFilter);
       return this.mapDataToVariable(data.data.content);
@@ -405,7 +405,7 @@ export class SevOneManager {
     if (queryType === 1) {
       return this.mapDataToFrame(response.data.content);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(response.data.content);
+      return this.mapDataToDeviceSelect(response.data.content);
     } else {
       return this.mapDataToVariable(response.data.content);
     }
@@ -430,7 +430,7 @@ export class SevOneManager {
     if (queryType === 1) {
       return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(results);
+      return this.mapDataToDeviceSelect(results);
     } else {
       return this.mapDataToVariable(results);
     }
@@ -445,7 +445,7 @@ export class SevOneManager {
     if (queryType === 1) {
       return this.mapDataToFrame(response.data.devices);
     } else if (queryType === 3) {
-      return this.mapDataToSelect(response.data.devices);
+      return this.mapDataToDeviceSelect(response.data.devices);
     } else {
       response.data.devices = this.applyVariableRegexFilter(response.data.devices, regexFilter);
       return this.mapDataToVariable(response.data.devices);
@@ -596,15 +596,19 @@ export class SevOneManager {
     return resultsparsed;
   }
 
-  async mapDataToSelect(result: any) {
+  async mapDataToDeviceSelect(result: any) {
     if (result === undefined || result === null) {
       return [];
     }
+    const variables = getTemplateSrv().getVariables() as any;
+    let variableOptions = variables.map((variable: any) => {
+      return { label: `$${variable.id}`, value: `$${variable.id}` };
+    });
     let resultsparsed = result.map((row: any) => {
       return { label: row.name, value: row.id };
     });
-
-    return resultsparsed;
+    const deviceSelectOptions = variableOptions.concat(resultsparsed);
+    return deviceSelectOptions;
   }
 
   async mapObjectDataToSelect(result: any[], token: any) {
@@ -629,7 +633,13 @@ export class SevOneManager {
       return { label: `${device.name}--${row.name}`, value: row.id };
     });
 
-    return resultsparsed;
+    const variables = getTemplateSrv().getVariables() as any;
+    let variableOptions = variables.map((variable: any) => {
+      return { label: `$${variable.id}`, value: `$${variable.id}` };
+    });
+
+    const objectSelectOptions = variableOptions.concat(resultsparsed);
+    return objectSelectOptions;
   }
 
   async mapIndicatorDataToSelect(
@@ -655,8 +665,13 @@ export class SevOneManager {
       let matchingObject = object.find((singleObject: any) => singleObject.value === row.objectId);
       return { label: `${matchingObject?.label}--${row.name}`, value: row.id };
     });
+    const variables = getTemplateSrv().getVariables() as any;
+    let variableOptions = variables.map((variable: any) => {
+      return { label: `$${variable.id}`, value: `$${variable.id}` };
+    });
 
-    return resultsparsed;
+    const indicatorSelectOptions = variableOptions.concat(resultsparsed);
+    return indicatorSelectOptions;
   }
 
   getVariableValue(variableName: string) {
