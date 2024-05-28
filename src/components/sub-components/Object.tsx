@@ -9,9 +9,10 @@ interface SubComponentProps {
   setObject: any;
   datasource: DataSource;
   device: Array<SelectableValue<string>>;
+  deviceGroup: SelectableValue<string> | null;
 }
 
-const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, datasource, device }) => {
+const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, datasource, device, deviceGroup }) => {
   const [objectOptions, setObjectOptions] = React.useState([{ label: 'Loading ...', value: '' }]);
   // console.log('render Object component');
 
@@ -23,7 +24,7 @@ const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, d
       try {
         let token = '';
         token = await datasource.getToken();
-        results = await datasource.sevOneConnection.getObjects(token, 3, device, 20, 0, '');
+        results = await datasource.sevOneConnection.getObjects(token, 3, device, deviceGroup, 20, 0, '');
       } catch (err) {
         console.error('Error Loading Devices: ', err);
         results = [{ label: 'Error Loading Devices', value: '' }];
@@ -36,7 +37,7 @@ const Object: React.FC<SubComponentProps> = ({ object, updateQuery, setObject, d
     return () => {
       unmounted = true;
     };
-  }, [datasource, device]);
+  }, [datasource, device, deviceGroup]);
 
   return (
     <div>

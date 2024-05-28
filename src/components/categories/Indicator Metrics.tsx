@@ -37,7 +37,14 @@ const IndicatorMetrics: React.FC<SubComponentProps> = ({ query, updateQuery, dat
         datasource={datasource}
         deviceGroup={deviceGroup}
       />
-      <Object object={object} updateQuery={updateQuery} setObject={setObject} datasource={datasource} device={device} />
+      <Object
+        object={object}
+        updateQuery={updateQuery}
+        setObject={setObject}
+        datasource={datasource}
+        device={device}
+        deviceGroup={deviceGroup}
+      />
       <Indicator
         indicator={indicator}
         updateQuery={updateQuery}
@@ -45,6 +52,7 @@ const IndicatorMetrics: React.FC<SubComponentProps> = ({ query, updateQuery, dat
         datasource={datasource}
         device={device}
         object={object}
+        deviceGroup={deviceGroup}
       />
     </>
   );

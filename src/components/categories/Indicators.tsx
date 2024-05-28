@@ -39,7 +39,14 @@ const Indicators: React.FC<SubComponentProps> = ({ query, updateQuery, datasourc
         datasource={datasource}
         deviceGroup={deviceGroup}
       />
-      <Object object={object} updateQuery={updateQuery} setObject={setObject} datasource={datasource} device={device} />
+      <Object
+        object={object}
+        updateQuery={updateQuery}
+        setObject={setObject}
+        datasource={datasource}
+        device={device}
+        deviceGroup={deviceGroup}
+      />
       <Size size={size} updateQuery={updateQuery} setSize={setSize} />
       <Page page={page} updateQuery={updateQuery} setPage={setPage} />
     </>

@@ -10,6 +10,7 @@ interface SubComponentProps {
   datasource: DataSource;
   device: Array<SelectableValue<string>>;
   object: Array<SelectableValue<string>>;
+  deviceGroup: SelectableValue<string> | null;
 }
 
 const Indicator: React.FC<SubComponentProps> = ({
@@ -19,6 +20,7 @@ const Indicator: React.FC<SubComponentProps> = ({
   datasource,
   device,
   object,
+  deviceGroup,
 }) => {
   const [indicatorOptions, setIndicatorOptions] = React.useState([{ label: 'Loading ...', value: '' }]);
   // console.log('render Indicator component');
@@ -31,7 +33,7 @@ const Indicator: React.FC<SubComponentProps> = ({
       try {
         let token = '';
         token = await datasource.getToken();
-        results = await datasource.sevOneConnection.getIndicators(token, 3, device, object, 20, 0, '');
+        results = await datasource.sevOneConnection.getIndicators(token, 3, device, deviceGroup, object, 20, 0, '');
       } catch (err) {
         console.error('Error Loading Devices: ', err);
         results = [{ label: 'Error Loading Devices', value: '' }];
@@ -44,7 +46,7 @@ const Indicator: React.FC<SubComponentProps> = ({
     return () => {
       unmounted = true;
     };
-  }, [datasource, device, object]);
+  }, [datasource, device, object, deviceGroup]);
 
   return (
     <div>

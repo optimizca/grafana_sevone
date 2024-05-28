@@ -57,9 +57,9 @@ export class SevOneManager {
     if (queryType === 0) {
       return results;
     } else if (queryType === 3) {
-      return this.mapDataToDeviceSelect(results);
+      return this.mapDataToDeviceSelect(results, true);
     } else {
-      return this.mapDataToVariable(results);
+      return this.mapDeviceToVariable(results);
     }
   }
 
@@ -87,7 +87,7 @@ export class SevOneManager {
       return this.mapDeviceDataToFrame(results);
     } else {
       results = this.applyVariableRegexFilter(results, regexFilter);
-      return this.mapDataToVariable(results);
+      return this.mapDeviceToVariable(results);
     }
   }
 
@@ -132,10 +132,10 @@ export class SevOneManager {
     } else if (queryType === 1) {
       return this.mapDataToFrame(data.data.content);
     } else if (queryType === 3) {
-      return this.mapDataToDeviceSelect(data.data.content);
+      return this.mapDataToDeviceSelect(data.data.content, true);
     } else {
       data.data.content = this.applyVariableRegexFilter(data.data.content, regexFilter);
-      return this.mapDataToVariable(data.data.content);
+      return this.mapDeviceToVariable(data.data.content);
     }
   }
 
@@ -176,7 +176,7 @@ export class SevOneManager {
     if (queryType === 0) {
       return results;
     } else {
-      return this.mapDataToVariable(results);
+      return this.mapObjectToVariable(results, device);
     }
   }
 
@@ -222,13 +222,18 @@ export class SevOneManager {
     token: any,
     queryType: number,
     device: Array<SelectableValue<string>>,
+    deviceGroup: SelectableValue<string> | null,
     size: number,
     page: number,
     regexFilter: string
   ) {
     device = await this.translateDevice(device, token);
+
     if (device.length === 0) {
-      return [];
+      device = await this.getDeviceGroupMembers(token, 4, deviceGroup, '');
+      if (device.length === 0) {
+        return [];
+      }
     }
     let responses: any[] = [];
     device.forEach((singleDevice) => {
@@ -246,10 +251,10 @@ export class SevOneManager {
     } else if (queryType === 1) {
       return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapObjectDataToSelect(results, token);
+      return this.mapObjectDataToSelect(results, device);
     } else {
       results = this.applyVariableRegexFilter(results, regexFilter);
-      return this.mapDataToVariable(results);
+      return this.mapObjectToVariable(results, device);
     }
   }
 
@@ -274,12 +279,16 @@ export class SevOneManager {
     token: any,
     queryType: number,
     device: Array<SelectableValue<string>>,
+    deviceGroup: SelectableValue<string> | null,
     object: Array<SelectableValue<string>>,
     size: number,
     page: number,
     regexFilter: string
   ) {
     device = await this.translateDevice(device, token);
+    if (device.length === 0) {
+      device = await this.getDeviceGroupMembers(token, 4, deviceGroup, '');
+    }
     object = await this.translateObject(device, object, token);
     if (device.length === 0 || object.length === 0) {
       return [];
@@ -314,10 +323,10 @@ export class SevOneManager {
     } else if (queryType === 1) {
       return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapIndicatorDataToSelect(results, device, object);
+      return this.mapIndicatorDataToSelect(results, object);
     } else {
       results = this.applyVariableRegexFilter(results, regexFilter);
-      return this.mapDataToVariable(results);
+      return this.mapIndicatorToVariable(results, object);
     }
   }
 
@@ -327,7 +336,7 @@ export class SevOneManager {
     inputObject: Array<SelectableValue<string>>,
     indicatorIdentifier: any
   ): Promise<Array<SelectableValue<string>>> {
-    let results = await this.getIndicators(token, 0, inputDevice, inputObject, 100, 0, '');
+    let results = await this.getIndicators(token, 0, inputDevice, null, inputObject, 100, 0, '');
     if (results.length === 0) {
       return [];
     }
@@ -353,12 +362,16 @@ export class SevOneManager {
   async getIndicatorData(
     token: any,
     device: Array<SelectableValue<string>>,
+    deviceGroup: SelectableValue<string> | null,
     object: Array<SelectableValue<string>>,
     indicator: Array<SelectableValue<string>>,
     starttime: number | undefined,
     endtime: number | undefined
   ) {
     device = await this.translateDevice(device, token);
+    if (device.length === 0) {
+      device = await this.getDeviceGroupMembers(token, 4, deviceGroup, '');
+    }
     object = await this.translateObject(device, object, token);
     indicator = await this.translateIndicator(device, object, indicator, token);
     if (device.length === 0 || object.length === 0 || indicator.length === 0) {
@@ -405,9 +418,9 @@ export class SevOneManager {
     if (queryType === 1) {
       return this.mapDataToFrame(response.data.content);
     } else if (queryType === 3) {
-      return this.mapDataToDeviceSelect(response.data.content);
+      return this.mapDataToDeviceSelect(response.data.content, true);
     } else {
-      return this.mapDataToVariable(response.data.content);
+      return this.mapDeviceToVariable(response.data.content);
     }
   }
 
@@ -430,25 +443,33 @@ export class SevOneManager {
     if (queryType === 1) {
       return this.mapDataToFrame(results);
     } else if (queryType === 3) {
-      return this.mapDataToDeviceSelect(results);
+      return this.mapDataToDeviceSelect(results, true);
     } else {
-      return this.mapDataToVariable(results);
+      return this.mapDeviceToVariable(results);
     }
   }
 
-  async getDeviceGroupMembers(token: any, queryType: number, deviceGroupID: string | undefined, regexFilter: string) {
-    if (deviceGroupID === undefined || deviceGroupID === null) {
+  async getDeviceGroupMembers(
+    token: any,
+    queryType: number,
+    deviceGroup: SelectableValue<string> | null,
+    regexFilter: string
+  ) {
+    deviceGroup = this.translateDeviceGroup(deviceGroup);
+    if (deviceGroup === null) {
       return [];
     }
-    let url = `/api/v2/devicegroups/${deviceGroupID}?includeMembers=true`;
+    let url = `/api/v2/devicegroups/${deviceGroup.value}?includeMembers=true`;
     let response = await this.request(url, token);
     if (queryType === 1) {
       return this.mapDataToFrame(response.data.devices);
     } else if (queryType === 3) {
-      return this.mapDataToDeviceSelect(response.data.devices);
+      return this.mapDataToDeviceSelect(response.data.devices, true);
+    } else if (queryType === 4) {
+      return this.mapDataToDeviceSelect(response.data.devices, false);
     } else {
       response.data.devices = this.applyVariableRegexFilter(response.data.devices, regexFilter);
-      return this.mapDataToVariable(response.data.devices);
+      return this.mapDeviceToVariable(response.data.devices);
     }
   }
 
@@ -588,7 +609,7 @@ export class SevOneManager {
     return frame;
   }
 
-  async mapDataToVariable(result: any) {
+  async mapDeviceToVariable(result: any[]) {
     let resultsparsed = result.map((row: any) => {
       return { text: row.name, value: row.id };
     });
@@ -596,14 +617,35 @@ export class SevOneManager {
     return resultsparsed;
   }
 
-  async mapDataToDeviceSelect(result: any) {
+  async mapObjectToVariable(result: any[], device: Array<SelectableValue<string>>) {
+    let resultsparsed = result.map((row: any) => {
+      let matchingDevice = device.find((singleDevice: any) => singleDevice.value === row.deviceId);
+      return { text: `${matchingDevice?.label}--${row.name}`, value: row.id };
+    });
+
+    return resultsparsed;
+  }
+
+  async mapIndicatorToVariable(result: any[], object: Array<SelectableValue<string>>) {
+    let resultsparsed = result.map((row: any) => {
+      let matchingObject = object.find((singleObject: any) => singleObject.value === row.objectId);
+      return { text: `${matchingObject?.label}--${row.name}`, value: row.id };
+    });
+
+    return resultsparsed;
+  }
+
+  async mapDataToDeviceSelect(result: any, addVariableOptions: boolean) {
     if (result === undefined || result === null) {
       return [];
     }
-    const variables = getTemplateSrv().getVariables() as any;
-    let variableOptions = variables.map((variable: any) => {
-      return { label: `$${variable.id}`, value: `$${variable.id}` };
-    });
+    let variableOptions = [];
+    if (addVariableOptions === true) {
+      const variables = getTemplateSrv().getVariables() as any;
+      variableOptions = variables.map((variable: any) => {
+        return { label: `$${variable.id}`, value: `$${variable.id}` };
+      });
+    }
     let resultsparsed = result.map((row: any) => {
       return { label: row.name, value: row.id };
     });
@@ -611,26 +653,14 @@ export class SevOneManager {
     return deviceSelectOptions;
   }
 
-  async mapObjectDataToSelect(result: any[], token: any) {
+  async mapObjectDataToSelect(result: any[], device: Array<SelectableValue<string>>) {
     if (result.length === 0) {
       return [];
     }
-    let deviceIDs: any[] = [];
-    result.forEach((row: any) => {
-      if (!deviceIDs.includes(row.deviceId)) {
-        deviceIDs.push(row.deviceId);
-      }
-    });
-    let deviceInput: Array<SelectableValue<string>> = deviceIDs.map((deviceID) => {
-      let device: SelectableValue<string> = { value: deviceID, label: '' };
-      return device;
-    });
-    let deviceInfo: any = await this.getDevice(token, deviceInput, 0, '');
-
     let resultsparsed = result.map((row: any) => {
-      let device = deviceInfo.find((singleDevice: any) => singleDevice.id === row.deviceId);
+      let matchingDevice = device.find((singleDevice: any) => singleDevice.value === row.deviceId);
       // return { label: row.name, value: row.id, description: `device: ${device.name}` };
-      return { label: `${device.name}--${row.name}`, value: row.id };
+      return { label: `${matchingDevice?.label}--${row.name}`, value: row.id };
     });
 
     const variables = getTemplateSrv().getVariables() as any;
@@ -642,24 +672,10 @@ export class SevOneManager {
     return objectSelectOptions;
   }
 
-  async mapIndicatorDataToSelect(
-    result: any[],
-    device: Array<SelectableValue<string>>,
-    object: Array<SelectableValue<string>>
-  ) {
+  async mapIndicatorDataToSelect(result: any[], object: Array<SelectableValue<string>>) {
     if (result.length === 0) {
       return [];
     }
-    let deviceIDs: any[] = [];
-    let objectIDs: any[] = [];
-    result.forEach((row: any) => {
-      if (!deviceIDs.includes(row.deviceId)) {
-        deviceIDs.push(row.deviceId);
-      }
-      if (!objectIDs.includes(row.objectId)) {
-        objectIDs.push(row.objectId);
-      }
-    });
 
     let resultsparsed = result.map((row: any) => {
       let matchingObject = object.find((singleObject: any) => singleObject.value === row.objectId);
@@ -677,9 +693,10 @@ export class SevOneManager {
   getVariableValue(variableName: string) {
     const variables = getTemplateSrv().getVariables() as any;
     const variable = variables.find((v: any) => v.id === variableName);
+    console.log(`getVariableValue ${variableName}: `, variable);
     if (variable && typeof variable.current !== 'undefined') {
       if (variable.current.value.length > 0 && variable.current.value[0] === '$__all') {
-        if (typeof variable.allValue !== 'undefined') {
+        if (typeof variable.allValue !== 'undefined' && variable.allValue !== null) {
           // All Option selected and All Value provided
           return variable.allValue;
         } else {
@@ -694,12 +711,44 @@ export class SevOneManager {
     return variableName;
   }
 
+  translateDeviceGroup(inputDeviceGroup: SelectableValue<string> | null) {
+    if (
+      inputDeviceGroup === null ||
+      inputDeviceGroup.value === undefined ||
+      typeof inputDeviceGroup.value !== 'string'
+    ) {
+      return inputDeviceGroup;
+    }
+    let deviceGroupBasedOnVariable: SelectableValue<string> = { label: '' };
+    let variableName = inputDeviceGroup.value;
+    if (variableName.indexOf('$') === 0) {
+      variableName = inputDeviceGroup.value.substring(1);
+    }
+    let realValues = this.getVariableValue(variableName);
+    if (typeof realValues === 'object') {
+      // Handle multi-select variables
+      // Not implemented on device groups for performance reasons
+      console.error('Multi-value and all options are disabled for device groups');
+      throw new Error('Multi-value and all options are disabled for device groups');
+      return null;
+    } else {
+      // Handle single select variables
+      // let deviceGroupBasedOnVariable: SelectableValue<string> = await this.getDeviceOption(token, realValues);
+      // device.push(deviceGroupBasedOnVariable);
+      deviceGroupBasedOnVariable.value = realValues;
+    }
+    return deviceGroupBasedOnVariable;
+  }
+
   async translateDevice(inputDevice: Array<SelectableValue<string>>, token: any) {
     let device: Array<SelectableValue<string>> = [];
     for (const singleDevice of inputDevice) {
       if (singleDevice.value !== undefined) {
         if (typeof singleDevice.value === 'string') {
-          let variableName = singleDevice.value.substring(1);
+          let variableName = singleDevice.value;
+          if (variableName.indexOf('$') === 0) {
+            variableName = singleDevice.value.substring(1);
+          }
           let realValues = this.getVariableValue(variableName);
           if (typeof realValues === 'object') {
             // Handle multi-select variables
