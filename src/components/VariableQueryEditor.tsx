@@ -8,6 +8,7 @@ import Devices from './categories/Devices';
 import Objects from './categories/Objects';
 import Indicators from './categories/Indicators';
 import VariableRegex from './sub-components/VariableRegex';
+import DeviceGroups from './categories/DeviceGroups';
 
 interface VariableQueryProps {
   query: MyVariableQuery;
@@ -27,6 +28,10 @@ export const VariableQueryEditor = ({ onChange, query, datasource }: VariableQue
   return (
     <>
       <QueryCategory query={queryWDefaults} updateQuery={updateQuery} datasource={datasource} isVariableEditor={true} />
+
+      {selectedQueryCategory.value === 'DeviceGroups' && (
+        <DeviceGroups query={queryWDefaults} updateQuery={updateQuery} datasource={datasource} />
+      )}
 
       {selectedQueryCategory.value === 'Devices' && (
         <Devices query={queryWDefaults} updateQuery={updateQuery} datasource={datasource} />

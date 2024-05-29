@@ -17,6 +17,11 @@ const QueryCategory: React.FC<SubComponentProps> = ({ query, updateQuery, dataso
 
   let queryOptions = [
     {
+      label: 'Device Groups',
+      value: 'DeviceGroups',
+      description: 'Grab All Device Groups',
+    },
+    {
       label: 'Devices',
       value: 'Devices',
       description: 'Grab All Devices Info from SevOne',

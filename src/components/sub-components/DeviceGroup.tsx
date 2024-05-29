@@ -27,7 +27,7 @@ const DeviceGroup: React.FC<SubComponentProps> = ({ deviceGroup, updateQuery, se
       try {
         let token = '';
         token = await datasource.getToken();
-        results = await datasource.sevOneConnection.getDeviceGroups(token, 3, 20, 0);
+        results = await datasource.sevOneConnection.getDeviceGroups(token, 3, 20, 0, '');
         allResults = await datasource.sevOneConnection.getAllDeviceGroups(token, 3);
       } catch (err) {
         console.error('Error Loading Devices: ', err);

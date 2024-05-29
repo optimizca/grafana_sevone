@@ -10,6 +10,7 @@ import Devices from './categories/Devices';
 import Objects from './categories/Objects';
 import Indicators from './categories/Indicators';
 import IndicatorMetrics from './categories/Indicator Metrics';
+import DeviceGroups from './categories/DeviceGroups';
 
 type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
@@ -24,6 +25,10 @@ export function QueryEditor({ query, onChange, datasource }: Props) {
   return (
     <>
       <QueryCategory query={query} updateQuery={updateQuery} datasource={datasource} isVariableEditor={false} />
+
+      {selectedQueryCategory.value === 'DeviceGroups' && (
+        <DeviceGroups query={query} updateQuery={updateQuery} datasource={datasource} />
+      )}
 
       {selectedQueryCategory.value === 'Devices' && (
         <Devices query={query} updateQuery={updateQuery} datasource={datasource} />

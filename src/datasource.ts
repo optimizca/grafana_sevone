@@ -48,6 +48,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     }
 
     switch (query.selectedQueryCategory.value) {
+      case 'DeviceGroups':
+        return this.sevOneConnection.getDeviceGroups(token, 2, query.size, query.page, regexFilter);
       case 'Devices':
         if (query.device.length === 0) {
           return this.sevOneConnection.getDeviceGroupMembers(token, 2, query.deviceGroup, regexFilter);
@@ -109,6 +111,8 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       console.log('==Defaulted Target Logging End==');
 
       switch (target.selectedQueryCategory.value) {
+        case 'DeviceGroups':
+          return this.sevOneConnection.getDeviceGroups(token, 1, target.size, target.page, '');
         case 'Devices':
           if (target.device.length === 0) {
             return this.sevOneConnection.getDeviceGroupMembers(token, 1, target.deviceGroup, '');
