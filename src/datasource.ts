@@ -51,7 +51,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       case 'DeviceGroups':
         return this.sevOneConnection.getDeviceGroups(token, 2, query.size, query.page, regexFilter);
       case 'Devices':
-        if (query.device.length === 0) {
+        if (query.device.length === 0 && query.deviceGroup !== null) {
           return this.sevOneConnection.getDeviceGroupMembers(token, 2, query.deviceGroup, regexFilter);
         } else if (query.device.length > 0) {
           return this.sevOneConnection.getDevice(token, query.device, 2, regexFilter) as any;
@@ -114,7 +114,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         case 'DeviceGroups':
           return this.sevOneConnection.getDeviceGroups(token, 1, target.size, target.page, '');
         case 'Devices':
-          if (target.device.length === 0) {
+          if (target.device.length === 0 && target.deviceGroup !== null) {
             return this.sevOneConnection.getDeviceGroupMembers(token, 1, target.deviceGroup, '');
           } else if (target.device.length > 0) {
             return this.sevOneConnection.getDevice(token, target.device, 1, '');
