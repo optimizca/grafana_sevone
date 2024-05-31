@@ -64,6 +64,11 @@
       "type": "dashboard",
       "name": "SevOne Device Dashboard",
       "path": "dashboards/SevOne Device Dashboard.json"
+    },
+    {
+      "type": "dashboard",
+      "name": "SevOne Device Group Dashboard",
+      "path": "dashboards/SevOne Device Group Dashboard.json"
     }
   ]
 }

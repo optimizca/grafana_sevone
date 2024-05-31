@@ -118,12 +118,11 @@
             "type": "optimiz-sevone-datasource",
             "uid": "${DS_SEV_ONE}"
           },
-          "device": [
-            {
-              "label": "$device",
-              "value": "$device"
-            }
-          ],
+          "device": [],
+          "deviceGroup": {
+            "label": "$deviceGroup",
+            "value": "$deviceGroup"
+          },
           "indicator": [],
           "object": [],
           "page": 0,
@@ -136,17 +135,7 @@
           "size": "6000"
         }
       ],
-      "title": "$device Details",
-      "transformations": [
-        {
-          "id": "reduce",
-          "options": {
-            "reducers": [
-              "lastNotNull"
-            ]
-          }
-        }
-      ],
+      "title": "$deviceGroup Devices",
       "type": "table"
     },
     {
@@ -209,12 +198,11 @@
             "type": "optimiz-sevone-datasource",
             "uid": "${DS_SEV_ONE}"
           },
-          "device": [
-            {
-              "label": "$device",
-              "value": "$device"
-            }
-          ],
+          "device": [],
+          "deviceGroup": {
+            "label": "$deviceGroup",
+            "value": "$deviceGroup"
+          },
           "indicator": [],
           "object": [],
           "page": 0,
@@ -227,7 +215,7 @@
           "size": "6000"
         }
       ],
-      "title": "$device Objects ",
+      "title": "$deviceGroup Objects ",
       "type": "table"
     },
     {
@@ -290,12 +278,11 @@
             "type": "optimiz-sevone-datasource",
             "uid": "${DS_SEV_ONE}"
           },
-          "device": [
-            {
-              "label": "$device",
-              "value": "$device"
-            }
-          ],
+          "device": [],
+          "deviceGroup": {
+            "label": "$deviceGroup",
+            "value": "$deviceGroup"
+          },
           "indicator": [],
           "object": [
             {
@@ -397,12 +384,11 @@
             "type": "optimiz-sevone-datasource",
             "uid": "${DS_SEV_ONE}"
           },
-          "device": [
-            {
-              "label": "$device",
-              "value": "$device"
-            }
-          ],
+          "device": [],
+          "deviceGroup": {
+            "label": "$deviceGroup",
+            "value": "$deviceGroup"
+          },
           "indicator": [
             {
               "label": "$indicators",
@@ -438,25 +424,25 @@
           "type": "optimiz-sevone-datasource",
           "uid": "${DS_SEV_ONE}"
         },
-        "definition": "Devices",
+        "definition": "DeviceGroups",
         "hide": 0,
         "includeAll": false,
-        "multi": true,
-        "name": "device",
+        "multi": false,
+        "name": "deviceGroup",
         "options": [],
         "query": {
           "device": [],
           "indicator": [],
           "object": [],
           "page": 0,
-          "regexFilter": "",
+          "regexFilter": "^((?!All Device Groups).)*$",
           "selectedQueryCategory": {
-            "description": "Grab All Devices Info from SevOne",
-            "label": "Devices",
-            "value": "Devices"
+            "description": "Grab All Device Groups",
+            "label": "Device Groups",
+            "value": "DeviceGroups"
           },
-          "size": "8000",
-          "useRegexFilter": false
+          "size": "6000",
+          "useRegexFilter": true
         },
         "refresh": 1,
         "regex": "",
@@ -477,12 +463,11 @@
         "name": "objects",
         "options": [],
         "query": {
-          "device": [
-            {
-              "label": "$device",
-              "value": "$device"
-            }
-          ],
+          "device": [],
+          "deviceGroup": {
+            "label": "$deviceGroup",
+            "value": "$deviceGroup"
+          },
           "indicator": [],
           "object": [],
           "page": 0,
@@ -514,12 +499,11 @@
         "name": "indicators",
         "options": [],
         "query": {
-          "device": [
-            {
-              "label": "$device",
-              "value": "$device"
-            }
-          ],
+          "device": [],
+          "deviceGroup": {
+            "label": "$deviceGroup",
+            "value": "$deviceGroup"
+          },
           "indicator": [],
           "object": [
             {
@@ -551,8 +535,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "SevOne Device Dashboard",
-  "uid": "bdnblnto01beoe",
-  "version": 2,
+  "title": "SevOne Device Group Dashboard",
+  "uid": "ddnam6so3y800b",
+  "version": 3,
   "weekStart": ""
 }
