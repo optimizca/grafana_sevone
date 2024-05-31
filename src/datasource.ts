@@ -9,7 +9,7 @@ import {
   MetricFindValue,
 } from '@grafana/data';
 import { getBackendSrv } from '@grafana/runtime';
-import _, { defaults } from 'lodash';
+import _, { defaults, mergeWith } from 'lodash';
 import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, MyVariableQuery, DEFAULT_VARIABLE_QUERY } from './types';
 import { SevOneManager } from 'SevOneManager';
 
@@ -33,50 +33,60 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     this.sevOneConnection = new SevOneManager(connectionOptions);
   }
 
-  async metricFindQuery(query: MyVariableQuery, options: any): Promise<MetricFindValue[]> {
+  customizer(objValue: any, srcValue: any) {
+    return objValue === undefined ? srcValue : objValue;
+  }
+
+  applyDefaults(query: Partial<MyVariableQuery>): MyVariableQuery {
+    return mergeWith({}, query, DEFAULT_VARIABLE_QUERY, this.customizer) as MyVariableQuery;
+  }
+
+  async metricFindQuery(query: Partial<MyVariableQuery>, options: any): Promise<MetricFindValue[]> {
     // Retrieve DataQueryResponse based on query.
-    query = defaults(query, DEFAULT_VARIABLE_QUERY);
+    let queryWDefaults = this.applyDefaults(query);
+
     let token = '';
     let tokenResponse = this.getToken();
     await tokenResponse.then((response) => {
       token = response;
     });
 
-    let regexFilter = query.regexFilter;
-    if (query.useRegexFilter === false) {
+    let regexFilter = queryWDefaults.regexFilter;
+    if (queryWDefaults.useRegexFilter === false) {
       regexFilter = '';
     }
 
-    switch (query.selectedQueryCategory.value) {
+    switch (queryWDefaults.selectedQueryCategory.value) {
       case 'DeviceGroups':
-        return this.sevOneConnection.getDeviceGroups(token, 2, query.size, query.page, regexFilter);
+        return this.sevOneConnection.getDeviceGroups(token, 2, queryWDefaults.size, queryWDefaults.page, regexFilter);
       case 'Devices':
-        if (query.device.length === 0 && query.deviceGroup !== null) {
-          return this.sevOneConnection.getDeviceGroupMembers(token, 2, query.deviceGroup, regexFilter);
-        } else if (query.device.length > 0) {
-          return this.sevOneConnection.getDevice(token, query.device, 2, regexFilter) as any;
+        if (queryWDefaults.device.length === 0 && queryWDefaults.deviceGroup !== null) {
+          console.log('BSR Variable queryWDefaults.deviceGroup: ', queryWDefaults.deviceGroup);
+          return this.sevOneConnection.getDeviceGroupMembers(token, 2, queryWDefaults.deviceGroup, regexFilter);
+        } else if (queryWDefaults.device.length > 0) {
+          return this.sevOneConnection.getDevice(token, queryWDefaults.device, 2, regexFilter) as any;
         } else {
-          return this.sevOneConnection.getDevices(token, 2, query.size, query.page, regexFilter);
+          return this.sevOneConnection.getDevices(token, 2, queryWDefaults.size, queryWDefaults.page, regexFilter);
         }
       case 'Objects':
         return this.sevOneConnection.getObjects(
           token,
           2,
-          query.device,
-          query.deviceGroup,
-          query.size,
-          query.page,
+          queryWDefaults.device,
+          queryWDefaults.deviceGroup,
+          queryWDefaults.size,
+          queryWDefaults.page,
           regexFilter
         );
       case 'Indicators':
         return this.sevOneConnection.getIndicators(
           token,
           2,
-          query.device,
-          query.deviceGroup,
-          query.object,
-          query.size,
-          query.page,
+          queryWDefaults.device,
+          queryWDefaults.deviceGroup,
+          queryWDefaults.object,
+          queryWDefaults.size,
+          queryWDefaults.page,
           regexFilter
         );
       default:

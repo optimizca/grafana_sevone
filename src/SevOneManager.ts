@@ -103,25 +103,44 @@ export class SevOneManager {
     return deviceID;
   }
 
-  async getDeviceOption(token: any, deviceIdentifier: any): Promise<SelectableValue<string>> {
-    let body = {};
-    if (isNaN(+deviceIdentifier)) {
-      // Value is a string or name of device
-      body = { name: deviceIdentifier };
-    } else {
-      // Value is a number or ID of device
-      body = { ids: [+deviceIdentifier] };
+  async getDeviceOption(token: any, deviceIdentifiers: any[]): Promise<Array<SelectableValue<string>>> {
+    let body: any = { ids: [], names: [] };
+    deviceIdentifiers.forEach((deviceIdentifier) => {
+      if (isNaN(+deviceIdentifier)) {
+        // Value is a string or name of device
+        body.names.push(deviceIdentifier);
+      } else {
+        // Value is a number or ID of device
+        body.ids.push(+deviceIdentifier);
+      }
+    });
+    if (body.ids.length === 0) {
+      delete body.ids;
+    } else if (body.names.length === 0) {
+      delete body.names;
     }
     let url = `/api/v2/devices/filter`;
     let result: any = await this.postRequest(url, token, body);
     if (result.data.content.length === 0) {
-      return {};
+      return [];
     }
-    let deviceOption: SelectableValue<string> = {
-      label: result.data.content[0].name,
-      value: result.data.content[0].id,
-    };
-    return deviceOption;
+    let finalResults: any[] = [];
+    deviceIdentifiers.forEach((deviceIdentifier) => {
+      if (isNaN(+deviceIdentifier)) {
+        // Ensure result is exact match of object name provided in Grafana as the API does a contains search
+        finalResults = finalResults.concat(
+          result.data.content.filter((object: any) => object.name === deviceIdentifier)
+        );
+      } else {
+        finalResults = finalResults.concat(
+          result.data.content.filter((object: any) => object.id === +deviceIdentifier)
+        );
+      }
+    });
+    let deviceOptions: Array<SelectableValue<string>> = finalResults.map((finalResult) => {
+      return { label: finalResult.name, value: finalResult.id };
+    });
+    return deviceOptions;
   }
 
   async getDevices(token: any, queryType: number, size: number, page: number, regexFilter: string) {
@@ -709,17 +728,21 @@ export class SevOneManager {
       if (variable.current.value.length > 0 && variable.current.value[0] === '$__all') {
         if (typeof variable.allValue !== 'undefined' && variable.allValue !== null) {
           // All Option selected and All Value provided
-          return variable.allValue;
+          return [variable.allValue];
         } else {
           // All Option selected so loop over all options in the variable except special All option
           return variable.options.filter((option: any) => option.value !== '$__all').map((option: any) => option.value);
         }
       }
       // All Option was not selected so we return either the single or multi value
-      return variable.current.value;
+      if (typeof variable.current.value === 'object') {
+        return variable.current.value;
+      } else {
+        return [variable.current.value];
+      }
     }
     // Couldn't find a variable with the name provided so we were given a non variable value and will return it
-    return variableName;
+    return [variableName];
   }
 
   translateDeviceGroup(inputDeviceGroup: SelectableValue<string> | null) {
@@ -736,7 +759,7 @@ export class SevOneManager {
       variableName = inputDeviceGroup.value.substring(1);
     }
     let realValues = this.getVariableValue(variableName);
-    if (typeof realValues === 'object') {
+    if (realValues.length > 1) {
       // Handle multi-select variables
       // Not implemented on device groups for performance reasons
       console.error('Multi-value and all options are disabled for device groups');
@@ -746,7 +769,7 @@ export class SevOneManager {
       // Handle single select variables
       // let deviceGroupBasedOnVariable: SelectableValue<string> = await this.getDeviceOption(token, realValues);
       // device.push(deviceGroupBasedOnVariable);
-      deviceGroupBasedOnVariable.value = realValues;
+      deviceGroupBasedOnVariable.value = realValues[0];
     }
     return deviceGroupBasedOnVariable;
   }
@@ -761,19 +784,8 @@ export class SevOneManager {
             variableName = singleDevice.value.substring(1);
           }
           let realValues = this.getVariableValue(variableName);
-          if (typeof realValues === 'object') {
-            // Handle multi-select variables
-            let devicesBasedOnVariable: Array<SelectableValue<string>> = [];
-            for (const realValue of realValues) {
-              let deviceOption: SelectableValue<string> = await this.getDeviceOption(token, realValue);
-              devicesBasedOnVariable.push(deviceOption);
-            }
-            device = device.concat(devicesBasedOnVariable);
-          } else {
-            // Handle single select variables
-            let deviceBasedOnVariable: SelectableValue<string> = await this.getDeviceOption(token, realValues);
-            device.push(deviceBasedOnVariable);
-          }
+          let devicesBasedOnVariable: Array<SelectableValue<string>> = await this.getDeviceOption(token, realValues);
+          device = device.concat(devicesBasedOnVariable);
         } else {
           // This option of the select was not a variable so it is returned as is
           device.push(singleDevice);
