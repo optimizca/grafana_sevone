@@ -19,8 +19,8 @@ const Page: React.FC<SubComponentProps> = ({ page, updateQuery, setPage }) => {
             width={20}
             defaultValue={page}
             onBlur={(e) => {
-              updateQuery('page', e.target.value);
-              setPage(e.target.value);
+              updateQuery('page', parseInt(e.target.value, 10));
+              setPage(parseInt(e.target.value, 10));
             }}
           />
         </InlineField>

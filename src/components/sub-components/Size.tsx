@@ -19,8 +19,8 @@ const Size: React.FC<SubComponentProps> = ({ size, updateQuery, setSize }) => {
             width={20}
             defaultValue={size}
             onBlur={(e) => {
-              updateQuery('size', e.target.value);
-              setSize(e.target.value);
+              updateQuery('size', parseInt(e.target.value, 10));
+              setSize(parseInt(e.target.value, 10));
             }}
           />
         </InlineField>

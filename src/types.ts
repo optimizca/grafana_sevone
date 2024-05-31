@@ -41,7 +41,7 @@ export const DEFAULT_VARIABLE_QUERY: Partial<MyVariableQuery> = {
     description: 'Grab All Devices Info from SevOne',
   },
   page: 0,
-  size: 20,
+  size: 100,
   device: [],
   object: [],
   indicator: [],
