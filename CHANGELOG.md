@@ -2,6 +2,10 @@
 
 Breaking changes are distinguished by this symbol: 🔧
 
+## 1.1.1 (2024-06-14)
+
+- Updated NPM dependencies
+
 ## 1.1.0 (2024-05-31)
 
 - Added TLS Skip Verify checkbox to datasource configuration page
