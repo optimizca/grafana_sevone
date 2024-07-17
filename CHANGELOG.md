@@ -2,6 +2,10 @@
 
 Breaking changes are distinguished by this symbol: 🔧
 
+## 1.1.2 (2024-07-17)
+
+- Updated NPM dependencies
+
 ## 1.1.1 (2024-06-14)
 
 - Updated NPM dependencies
